@@ -1,0 +1,6 @@
+patient_view.checklist:
+  path: '/checklist/{pid}/{nid}'
+  defaults:
+    _controller: '\Drupal\patient_view\Controller\PatientViewController::displayChecklist'
+  requirements:
+    _permission: 'access content'

@@ -1,0 +1,124 @@
+/* Contact summary */
+.contact-summary {
+  padding-bottom: 1em;
+}
+.contact-summary .contact-id,
+.contact-summary .contact-user-dashboard {
+  float: right;
+  clear: right;
+}
+.contact-summary .contacts-header-image {
+  float: left;
+  margin-right: 10px;
+}
+
+/* Summary tab */
+.dash-content > * {
+  width: 48%;
+  float: left;
+}
+.dash-left {
+  margin-right: 4%;
+}
+.dash-card-header > * {
+  display: inline;
+  vertical-align: middle;
+  font-size: 1rem;
+}
+.dash-card-header .manage-links {
+  float: right;
+}
+
+/* Tweaks for when running inside the Claro admin theme */
+#block-claro-content .contacts-tabs-content {
+  /* Alter the tab content padding */
+  padding-right: 1.5rem;
+  padding-left: 1.5rem;
+  padding-bottom: 1.5rem;
+}
+
+#block-claro-page-title {
+  /* Remove the page heading (which displays the contact name) as this is displayed within the page */
+  display: none;
+}
+#block-claro-breadcrumbs {
+  /* Fix up the padding of the Breadcrums section because we've removed the title section. */
+  padding-bottom: 1em;
+}
+
+#block-claro-content .contacts-tabs .vertical-tabs__menu {
+  /* Default is 20em */
+  width: 10em;
+}
+#block-claro-content .contacts-tabs .vertical-tabs__panes {
+  /* Default is 20em */
+  margin-left: 10em;
+}
+#block-claro-content .dash-top,
+#block-claro-content .dash-bottom {
+  /* Fix width of tab content dashboard blocks */
+  width: 100%;
+}
+#block-claro-content h2 {
+  font-size: 1.3rem;
+}
+#block-claro-content .contact-summary {
+  border: 1px solid #dedfe4;
+  border-radius: 2px;
+  box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
+  padding: 1rem;
+}
+#block-claro-content .contact-summary h2 {
+  margin-top: 0;
+}
+#block-claro-content .contacts-tabs-content .field.field--label-above {
+  margin-top: 1rem;
+}
+#block-claro-content .contacts-tabs-content .field--type-address p.address {
+  margin: 0;
+}
+/* End tweaks for running in the Claro admin theme */
+
+/* Tweaks for running in the Seven admin theme */
+#block-seven-page-title {
+  /* Remove the page heading (which displays the contact name) as this is displayed within the page */
+  display: none;
+}
+
+#block-seven-content .contacts-tabs-content {
+  background-color: #fcfcfa;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+#block-seven-content .contact-summary h2 {
+  /* Fix positioning of contact's name */
+  display: inline;
+}
+#block-seven-content .contacts-duplicates table {
+  /* Fix spacing between Apply button and the table on duplicates tab */
+  margin-top: 1em;
+}
+#block-seven-content .dash-top,
+#block-seven-content .dash-bottom {
+  /* Fix width of tab content dashboard blocks */
+  width: 100%;
+}
+#block-seven-content .contacts-tabs .vertical-tabs__menu {
+  /* Default is 240px */
+  width: 180px;
+}
+#block-seven-content .contacts-tabs .vertical-tabs__panes {
+  /* Default is 240px */
+  margin-left: 180px;
+}
+#block-seven-content .card {
+  /* Unlike Claro, Seven doesn't have 'card' widget css, so just add something very basic */
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+#block-seven-content .contacts-tabs-content .field.field--label-above {
+  margin-top: 10px;
+}
+#block-seven-content .contacts-tabs-content .field--type-address p.address {
+  margin: 0;
+}

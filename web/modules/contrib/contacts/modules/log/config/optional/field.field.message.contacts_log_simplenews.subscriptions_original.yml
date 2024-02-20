@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.message.subscriptions_original
+    - message.template.contacts_log_simplenews
+id: message.contacts_log_simplenews.subscriptions_original
+field_name: subscriptions_original
+entity_type: message
+bundle: contacts_log_simplenews
+label: 'Previous subscriptions'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:simplenews_newsletter'
+  handler_settings:
+    target_bundles: null
+    auto_create: false
+field_type: entity_reference

@@ -1,0 +1,22 @@
+<div {{ attributes }}>
+  <div class="dash-top">
+    <div {{ region_attributes.top.setAttribute('data-contacts-manage-region-id', 'top') }}>
+      {{ content.top }}
+    </div>
+  </div>
+  <div class="dash-left">
+    <div {{ region_attributes.left.setAttribute('data-contacts-manage-region-id', 'left') }}>
+      {{ content.left }}
+    </div>
+  </div>
+  <div class="dash-right">
+    <div {{ region_attributes.right.setAttribute('data-contacts-manage-region-id', 'right') }}>
+      {{ content.right }}
+    </div>
+  </div>
+  <div class="dash-bottom">
+    <div {{ region_attributes.bottom.setAttribute('data-contacts-manage-region-id', 'bottom') }}>
+      {{ content.bottom }}
+    </div>
+  </div>
+</div>

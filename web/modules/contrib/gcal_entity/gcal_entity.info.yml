@@ -1,0 +1,10 @@
+name: 'Google Calendar Entity'
+type: module
+description: 'Integrate GCal as an Entity (inspired by the D7 agenda module)'
+core_version_requirement: ^8 || ^9 || ^10
+package: 'Custom'
+
+# Information added by Drupal.org packaging script on 2023-06-21
+version: '2.0.4'
+project: 'gcal_entity'
+datestamp: 1687384192

@@ -1,0 +1,44 @@
+{
+    "name": "drupal/contacts",
+    "description": "Creates a contacts list using decoupled users.",
+    "type": "drupal-module",
+    "license": "GPL-2.0+",
+    "homepage": "https://drupal.org/project/contacts",
+    "support": {
+        "issues": "https://drupal.org/project/issues/contacts",
+        "source": "https://git.drupalcode.org/project/contacts"
+    },
+    "require": {
+        "cweagans/composer-patches": "~1.0",
+        "drupal/address": "~1.6",
+        "drupal/core": "^9 || ^10",
+        "drupal/ctools": "~3.8",
+        "drupal/color_field": "~3.0",
+        "drupal/decoupled_auth": "^1.0 || ^2.0",
+        "drupal/facets": "^3.0@beta",
+        "drupal/geocoder": "^3.26 || ^4.4",
+        "drupal/geofield": "^1.39",
+        "drupal/group": "^1.0-rc2",
+        "drupal/leaflet": "^2.1 || ^10.0",
+        "drupal/message": "^1.4",
+        "drupal/name": "^1.0-rc3",
+        "drupal/profile": "^1.2",
+        "drupal/search_api": "^1.17",
+        "drupal/token": "^1.11"
+    },
+    "conflict": {
+        "drupal/search_api_solr": "<4.1",
+        "drupal/views_data_export": "<1.0-rc1",
+        "drupal/csv_serialization": "<2.0-beta1"
+    },
+    "suggest": {
+        "drupal/contacts_theme": "Provides themeing for the contacts pages with blocks automatically added to the correct regions."
+    },
+    "extra": {
+        "patches": {
+            "drupal/ctools": {
+                "#2667652: Option to expose filters in block on views block display": "https://www.drupal.org/files/issues/ctools-option_to_expose-2667652-3.patch"
+            }
+        }
+    }
+}

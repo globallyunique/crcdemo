@@ -1,0 +1,18 @@
+<?php
+
+/**
+ * @file
+ * Hook implementations for Theme Negotiation by Rules module.
+ */
+
+declare(strict_types = 1);
+
+/**
+ * Implements hook_plugin_filter_TYPE__CONSUMER_alter().
+ */
+function theme_rule_plugin_filter_condition__theme_rule_alter(array &$definitions, array $extra): void {
+  unset($definitions['current_theme']);
+  if (!\Drupal::languageManager()->isMultilingual()) {
+    unset($definitions['language']);
+  }
+}

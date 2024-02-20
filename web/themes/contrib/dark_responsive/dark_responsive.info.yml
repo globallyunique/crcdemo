@@ -1,0 +1,25 @@
+name: Dark Responsive
+type: theme
+description: 'Dark Responsive Fully responsive theme provide <b>Video Slider, Social Media Icon, Footer Copyright.</b><br>Developed BY <b><a href="https://www.drupal.org/u/arti_parmar">Arti Parmar</a></b>.'
+base theme: false
+core_version_requirement: ^9 || ^10
+libraries:
+  - dark_responsive/theme-styling
+
+# Regions
+regions:
+  header: 'Header/Logo'
+  nav_main: 'Main navigation'
+  breadcrumb: 'Breadcrumbs'
+  content: 'Main content'
+  sidebar_first: 'Sidebar first'
+  sidebar_second: 'Sidebar second'
+  footer: 'Footer'
+
+  # Auto hidden
+  auto_hidden_block: 'Auto hidden blocks'
+
+# Information added by Drupal.org packaging script on 2023-07-19
+version: '1.0.2'
+project: 'dark_responsive'
+datestamp: 1689768521

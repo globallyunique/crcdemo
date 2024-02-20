@@ -1,0 +1,16 @@
+name: Contacts Log
+description: "Contacts logging of common CRM operations."
+package: Contacts
+type: module
+core_version_requirement: ^9 || ^10
+
+dependencies:
+  - contacts:contacts
+  - message:message
+  - profile:profile
+  - token:token
+
+# Information added by Drupal.org packaging script on 2023-11-16
+version: '2.2.1'
+project: 'contacts'
+datestamp: 1700128745

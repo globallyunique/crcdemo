@@ -1,0 +1,16 @@
+.gcal-entity-event{
+  display: flex;
+  padding: .25rem 0;
+align-items: center;
+align-content: space-between;
+}
+
+.gcal-entity-date {
+  display: block;
+  width: 40px;
+  text-align: center;
+  color: #fff;
+  background-color: #000000;
+  padding: .1rem 0;
+  margin-right: .2rem;
+}

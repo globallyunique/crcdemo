@@ -1,0 +1,33 @@
+uikit:
+  remote: https://getuikit.com/
+  version: 3.6.20
+  license:
+    name: MIT
+    url: https://github.com/uikit/uikit/blob/develop/LICENSE.md
+    gpl-compatible: true
+  css:
+#    base:
+#      //cdnjs.cloudflare.com/ajax/libs/uikit/3.6.20/css/uikit.min.css: { type: external, minified: true }
+  js:
+    //cdn.jsdelivr.net/npm/uikit@3.6.20/dist/js/uikit.min.js: { type: external, minified: true }
+    //cdn.jsdelivr.net/npm/uikit@3.6.20/dist/js/uikit-icons.min.js: { type: external, minified: true }
+  dependencies:
+    - core/once
+    - core/drupal
+
+global-style:
+  css:
+    theme:
+      css/theme.css: { minified: true }
+      css/style.css: { minified: true }
+
+fonts:
+  version: VERSION
+  remote: //fonts.googleapis.com/css
+  css:
+    theme:
+      //fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&display=swap": { type: external }
+  license:
+    name: SIL Open Font License, 1.1
+    url: //scripts.sil.org/OFL
+    gpl-compatible: true

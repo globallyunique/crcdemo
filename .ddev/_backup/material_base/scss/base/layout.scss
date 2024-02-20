@@ -1,0 +1,142 @@
+// Box-sizing.
+
+* {
+  box-sizing: border-box;
+}
+
+.cke *,
+.toolbar * {
+  box-sizing: content-box;
+}
+
+.layout-container {
+  margin: 0;
+}
+
+// Page layout.
+
+.layout-container--page {
+  .main-content__container {
+    @extend .container;
+  }
+
+  flex-grow: 1;
+  display: flex;
+  flex-direction: row;
+}
+
+img,
+embed,
+object,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+html,
+body {
+  min-height: 100vh;
+}
+
+body,
+.dialog-off-canvas-main-canvas,
+.page-container,
+.page-navbar-adjust,
+.page-main {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.page {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: row;
+}
+
+//MV: Added to fix the sidebar issue
+
+.page-content {
+  flex-grow: 1;
+  display: flex;
+}
+
+.page-sidebar--first {
+  display: flex;
+  order: 1; // This will place the sidebar first in the row
+  flex-basis: 25%; // Adjust as needed
+  overflow: auto;
+  .views-label {
+    font-weight: bold;
+    font-size: $font-size-text-small;
+
+  }
+}
+
+.region-content {
+  display: flex;
+  order: 2; // This will place the content second in the row
+  overflow: auto;
+  flex-direction: column;
+  flex-basis: 100%; // Adjust as needed
+}
+
+.views-exposed-form { //MV: added to hide the Apply button on view search forms
+  .form-actions {
+      display: none;
+    }
+}
+/* Add space between table cells */
+.custom-view td,
+.custom-view th {
+  padding: 8px;
+}
+
+.custom-view th {
+  background-color: #f0f0f0;  /* Gray background */
+  border: 1px solid #ccc;  /* Thin border */
+  text-align: left;
+}
+/* Add border to table cells */
+.custom-view td {
+  border: 1px solid #ddd;
+}
+
+.custom-view table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+// Forum hack to the core
+
+/* Add space between table cells */
+.forum-hack-to-coretd,
+.forum-hack-to-core th {
+  padding: 8px;
+}
+
+.forum-hack-to-core th {
+  background-color: #f0f0f0;
+  /* Gray background */
+  border: 1px solid #ccc;
+  /* Thin border */
+}
+
+/* Add border to table cells */
+.forum-hack-to-core td {
+  border: 1px solid #ddd;
+}
+
+.forum-hack-to-core table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.block__heading h2 {
+  font-size: 1.25rem;
+  line-height: 2rem;
+  font-weight: 500;
+  font-family: "Roboto",sans-serif;
+  text-transform: uppercase;
+  color: #000;
+}

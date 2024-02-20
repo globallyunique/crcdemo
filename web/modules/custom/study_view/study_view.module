@@ -1,0 +1,98 @@
+<?php
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\maestro\Engine\MaestroEngine;
+use Drupal\node\Entity\Node;
+use Drupal\Core\Url;
+
+use Drupal\Core\File\FileSystemInterface;
+use Drupal\webform\Entity\Webform;
+use Symfony\Component\Yaml\Yaml;
+use Drupal\Core\StreamWrapper\PublicStream;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+
+
+function study_view_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
+  $form_ids = ['node_study_form','node_study_edit_form']; 
+  if (in_array($form_id, $form_ids)) {
+    \Drupal::logger('study_view_form_alter')->info('altering:' . $form_id);
+    // Change the label for form
+    $form['title']['widget'][0]['value']['#title'] = "Name";
+    // Hide Preview button
+    unset($form['actions']['preview']);
+    $form['actions']['submit']['#submit'][] = 'custom_study_redirection_submit_handler';
+  }
+}
+
+/* DONE: don't redirect to taskconsole*/
+function custom_study_redirection_submit_handler(array &$form, FormStateInterface $form_state) {
+    // Get the ID of the newly created content.
+    $study_node = $form_state->getFormObject()->getEntity();
+    $process_id = setup_new_study($study_node);
+    $study_node_id = $study_node->id();
+    // $url = Url::fromUri('internal:/taskconsole/'. $study_node_id.'/'. $process_id.'/0');
+
+
+    // $url = Url::fromUri('internal:/taskconsole');
+    // \Drupal::logger('custom_study_redirection_submit_handler')->info('redirecting to:'. $url->toString());
+    // $form_state->setRedirectUrl($url);
+
+    $url = Url::fromUri('internal:/studies');
+    \Drupal::logger('custom_study_redirection_submit_handler')->info('redirecting to:'. $url->toString());
+    $form_state->setRedirectUrl($url);
+}
+
+/*
+ - Start a workflow for the the work of setting up the study.
+*/
+function setup_new_study(Drupal\node\NodeInterface $study_node) {
+    $study_id = $study_node->get('field_id')->value;
+    \Drupal::logger('setup_new_study')->info('study_id:' . $study_id);
+    $user_name = \Drupal::currentUser()->getAccountName();
+    $process_id = \Drupal\utility_functions\UtilityFunctions::startProcess('study_sop_1', $study_node->id());
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_presave() for study entity.
+ */
+function study_view_node_presave(Drupal\node\NodeInterface $node) {
+  \Drupal::logger('study_view_node_presave')->info('node id:' . $node->id());
+  if ($node->bundle() == 'study') {
+    $study_id = $node->get('field_id')->value;
+    \Drupal::logger('study_view_study_presave')->info('study_id:' . $study_id);
+    setup_study_configs($study_id);
+  }
+}
+
+function setup_study_configs($study_id) {
+
+  $study = strtolower($study_id);
+  $drupal_root = \Drupal::root();
+  $working_folder = $drupal_root . '/config/' . $study . '/auto';
+
+  // The file system service.
+  $file_system = \Drupal::service('file_system');
+
+  // Ensure the directory exists.
+  if ($file_system->realpath($working_folder)) {
+
+    // Iterate the webforms
+    $files = new \DirectoryIterator($working_folder);
+    foreach ($files as $file_info) {
+      if (!$file_info->isDot() && $file_info->getExtension() === 'yaml') {
+        $file_path = $file_info->getPathname();
+        $file_full_name = $file_info->getFilename();
+        $file_name = pathinfo($file_full_name, PATHINFO_FILENAME); 
+        // Load and parse the YAML file.
+        $yaml_content = file_get_contents($file_path);
+        $entity_config = Yaml::parse($yaml_content);
+        \Drupal::logger('setup_study_configs')->info('@config', [
+          '@config' => $file_name,
+        ]);
+        \Drupal::configFactory()->getEditable($file_name)->setData($entity_config)->save();
+      }
+    }
+  }
+}
+
+

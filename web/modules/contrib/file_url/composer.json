@@ -1,0 +1,25 @@
+{
+  "name": "drupal/file_url",
+  "description": "Reference both local and remote files by URI.",
+  "type": "drupal-module",
+  "homepage": "http://drupal.org/project/file_uri",
+  "authors": [
+    {
+      "name": "Sander Van Dooren",
+      "homepage": "https://github.com/sandervd",
+      "role": "Maintainer"
+    },
+    {
+      "name": "Claudiu Cristea",
+      "email": "clau.cristea@gmail.com",
+      "homepage": "https://github.com/claudiu-cristea",
+      "role": "Maintainer"
+    }
+  ],
+  "support": {
+    "issues": "https://www.drupal.org/project/issues/file_url",
+    "source": "https://git.drupalcode.org/project/file_url"
+  },
+  "license": "GPL-2.0+",
+  "minimum-stability": "dev"
+}

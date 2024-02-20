@@ -1,0 +1,6 @@
+custom_commands.reset_patients:
+  title: 'Reset'
+  description: 'reset_patients'
+  route_name: custom_commands.reset_patients
+  menu_name: main
+  weight: 10

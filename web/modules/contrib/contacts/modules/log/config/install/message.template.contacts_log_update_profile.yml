@@ -1,0 +1,16 @@
+langcode: en
+status: true
+dependencies: {  }
+template: contacts_log_update_profile
+label: 'Profile Updated'
+description: 'A profile is updated.'
+text:
+  -
+    value: "<p>[message:profile:entity:type-label]&nbsp;profile updated.</p>\r\n"
+    format: basic_html
+settings:
+  'token options':
+    clear: false
+    'token replace': true
+  purge_override: false
+  purge_methods: {  }

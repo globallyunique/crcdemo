@@ -1,0 +1,143 @@
+langcode: en
+status: true
+dependencies: {  }
+id: w1_test_1234
+label: 'test_1234 - E1'
+app_group: 0
+canvas_height: 900
+canvas_width: 1600
+default_workflow_timeline_stage_count: 0
+show_details: false
+validated: true
+views_attached:
+  maestro_completed_tasks:
+    view_machine_name: maestro_completed_tasks
+    view_weight: -9
+    view_display: default;Master
+  maestro_entity_identifiers:
+    view_machine_name: maestro_entity_identifiers
+    view_weight: -10
+    view_display: 'taskconsole_display;Task Console Display'
+variables:
+  initiator:
+    variable_id: initiator
+    variable_value: '0'
+  workflow_timeline_stage_count:
+    variable_id: workflow_timeline_stage_count
+    variable_value: ''
+  workflow_current_stage:
+    variable_id: workflow_current_stage
+    variable_value: ''
+  workflow_current_stage_message:
+    variable_id: workflow_current_stage_message
+    variable_value: ''
+  patient_node_id:
+    variable_id: patient_node_id
+    variable_value: '-1'
+tasks:
+  start:
+    id: start
+    tasktype: MaestroStart
+    label: Start
+    nextstep: Activity1
+    nextfalsestep: ''
+    top: '110'
+    left: '80'
+    assignby: fixed
+    assignto: engine
+  end:
+    id: end
+    tasktype: MaestroEnd
+    label: End
+    nextstep: ''
+    nextfalsestep: ''
+    top: '100'
+    left: '940'
+    assignby: fixed
+    assignto: engine
+  Activity1:
+    id: Activity1
+    tasktype: MaestroWebform
+    label: 'Activity1'
+    nextstep: 'Another_Thing'
+    nextfalsestep: ''
+    runonce: false
+    top: '110'
+    left: '260'
+    assignby: fixed
+    assignto: ''
+    assigned: 'user:variable:initiator'
+    handler: ''
+    showindetail: true
+    participate_in_workflow_status_stage: false
+    workflow_status_stage_number: 0
+    workflow_status_stage_message: ''
+    data:
+      unique_id: t1_test_123
+      webform_machine_name: t1_test_123
+      modal: notmodal
+      skip_webform_handlers: 0
+      webform_nodes_attached_to: none
+      use_nodes_attached: 0
+      webform_nodes_attached_variable: none
+      redirect_to: taskconsole
+      show_edit_form: 1
+    notifications:
+      notification_assignment: ''
+      notification_reminder: ''
+      notification_escalation: ''
+      escalation_after: 0
+      reminder_after: 0
+      notification_assignment_subject: ''
+      notification_reminder_subject: ''
+      notification_escalation_subject: ''
+    raphael: ''
+    to: ''
+    pointedfrom: ''
+    falsebranch: ''
+    lines: {  }
+  Another_Thing:
+    id: Another_Thing
+    tasktype: MaestroWebform
+    label: 'Another Thing'
+    nextstep: 'end'
+    nextfalsestep: ''
+    runonce: false
+    top: '110'
+    left: '260'
+    assignby: fixed
+    assignto: ''
+    assigned: 'user:variable:initiator'
+    handler: ''
+    showindetail: true
+    participate_in_workflow_status_stage: false
+    workflow_status_stage_number: 0
+    workflow_status_stage_message: ''
+    data:
+      unique_id: t2_test_123
+      webform_machine_name: t2_test_123
+      modal: notmodal
+      skip_webform_handlers: 0
+      webform_nodes_attached_to: none
+      use_nodes_attached: 0
+      webform_nodes_attached_variable: none
+      redirect_to: taskconsole
+      show_edit_form: 1
+    notifications:
+      notification_assignment: ''
+      notification_reminder: ''
+      notification_escalation: ''
+      escalation_after: 0
+      reminder_after: 0
+      notification_assignment_subject: ''
+      notification_reminder_subject: ''
+      notification_escalation_subject: ''
+    raphael: ''
+    to: ''
+    pointedfrom: ''
+    falsebranch: ''
+    lines: {  }
+initiator: null
+workflow_timeline_stage_count: null
+workflow_current_stage: null
+workflow_current_stage_message: null

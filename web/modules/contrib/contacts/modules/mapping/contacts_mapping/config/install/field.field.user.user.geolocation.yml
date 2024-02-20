@@ -1,0 +1,23 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.user.geolocation
+  module:
+    - contacts_mapping
+    - user
+  enforced:
+    module:
+      - contacts_mapping
+id: user.user.geolocation
+field_name: geolocation
+entity_type: user
+bundle: user
+label: Geolocation
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: geofield_override

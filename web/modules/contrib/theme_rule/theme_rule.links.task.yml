@@ -1,0 +1,5 @@
+theme_rule.rules:
+  route_name: entity.theme_rule.collection
+  title: 'Theme rules'
+  base_route: system.themes_page
+  weight: 110

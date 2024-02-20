@@ -1,0 +1,10 @@
+name: 'Decoupled Auth Event tests'
+type: module
+description: 'Support module for event subscriber testing.'
+package: Testing
+core_version_requirement: ^8.8 || ^9
+
+# Information added by Drupal.org packaging script on 2023-04-26
+version: '2.0.0'
+project: 'decoupled_auth'
+datestamp: 1682502945

@@ -1,0 +1,77 @@
+:root {
+  /* Box */
+  --mix-box-color: inherit;
+  --mix-box-bg: inherit;
+  --mix-box-border: 1px;
+  --mix-box-border-color: transparent;
+  --mix-padding-x: 1.5rem;
+  --mix-padding-y: 1rem;
+  --mix-margin-bottom: 1rem;
+  /* Info box */
+  --mix-info-text-color: #0a58ca;
+  --mix-info-bg-color: #cfe2ff;
+  --mix-info-border-color: #9ec5fe;
+  --mix-info-link-color: #0a58ca;
+  /* Success box */
+  --mix-success-text-color: #146c43;
+  --mix-success-bg-color: #d1e7dd;
+  --mix-success-border-color: #a3cfbb;
+  --mix-success-link-color: #146c43;
+  /* Warning box */
+  --mix-warning-text-color: #997404;
+  --mix-warning-bg-color: #fff3cd;
+  --mix-warning-border-color: #ffe69c;
+  --mix-warning-link-color: #ffe69c;
+  /* Danger box */
+  --mix-danger-text-color: #b02a37;
+  --mix-danger-bg-color: #f8d7da;
+  --mix-danger-border-color: #f1aeb5;
+  --mix-danger-link-color: #f1aeb5;
+}
+
+.mix-full-width {
+  width: 100%;
+}
+
+/* A border-box style block  */
+.mix-box {
+  box-sizing: border-box;
+  padding: var(--mix-padding-y) var(--mix-padding-x);
+  margin-bottom: var(--mix-margin-bottom);
+  color: var(--mix-box-color);
+  background-color: var(--mix-box-bg);
+  border: var(--mix-box-border) solid var(--mix-box-border-color);
+}
+
+.mix-box a {
+  font-weight: 700;
+  color: var(--mix-box-color);
+}
+
+.mix-info {
+  --mix-box-color: var(--mix-info-text-color);
+  --mix-box-bg: var(--mix-info-bg-color);
+  --mix-box-border-color: var(--mix-info-border-color);
+}
+
+.mix-success {
+  --mix-box-color: var(--mix-success-text-color);
+  --mix-box-bg: var(--mix-success-bg-color);
+  --mix-box-border-color: var(--mix-success-border-color);
+}
+
+.mix-warning {
+  --mix-box-color: var(--mix-warning-text-color);
+  --mix-box-bg: var(--mix-warning-bg-color);
+  --mix-box-border-color: var(--mix-warning-border-color);
+}
+
+.mix-danger {
+  --mix-box-color: var(--mix-danger-text-color);
+  --mix-box-bg: var(--mix-danger-bg-color);
+  --mix-box-border-color: var(--mix-danger-border-color);
+}
+
+.mix-code {
+  font-family: monospace;
+}

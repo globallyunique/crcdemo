@@ -1,0 +1,10 @@
+type: module
+name: Theme Rule Test
+description: Testing module used in Theme Rule tests.
+core_version_requirement: ^9 || ^10
+package: Testing
+
+# Information added by Drupal.org packaging script on 2022-10-04
+version: '1.1.0'
+project: 'theme_rule'
+datestamp: 1664898107

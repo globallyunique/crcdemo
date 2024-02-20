@@ -1,0 +1,22 @@
+uuid: f17f8631-b8de-4c9c-ace2-d298392677e8
+langcode: en
+status: true
+dependencies:
+  module:
+    - help
+  theme:
+    - dark_responsive
+_core:
+  default_config_hash: jccFSSVqV0WCDb6NtML1VWAWTtDbZ-zn5YgTRMgMrIM
+id: dark_responsive_help
+theme: dark_responsive
+region: auto_hidden_block
+weight: -3
+provider: null
+plugin: help_block
+settings:
+  id: help_block
+  label: Help
+  label_display: '0'
+  provider: help
+visibility: {  }

@@ -1,0 +1,16 @@
+langcode: en
+status: true
+dependencies: {  }
+template: contacts_log_update_user
+label: 'User Updated'
+description: 'The user is updated.'
+text:
+  -
+    value: '<p>User account updated.</p>'
+    format: basic_html
+settings:
+  'token options':
+    clear: false
+    'token replace': true
+  purge_override: false
+  purge_methods: {  }

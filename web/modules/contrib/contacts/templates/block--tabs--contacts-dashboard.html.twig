@@ -1,0 +1,10 @@
+{#
+/**
+ * @file
+ * Override to remove markup around the contacts tab block.
+ *
+ * Without this, each ajax request for a tab will wrap the content in the selected
+ * theme's block markup (eg block.html.twig in the Claro theme)
+ */
+#}
+{{ content }}

@@ -1,0 +1,66 @@
+<?php
+
+/**
+ * @file
+ * Provides Drupal hooks used in Maestro.
+ *
+ * An example on how to load and save a value in a template:
+ * $template = MaestroEngine::getTemplate($templateMachineName);
+ * $template->variables['initiator']['variable_value'] = 1;
+ * $template->save();
+ */
+
+/**
+ * Implements hook_theme().
+ */
+function maestro_template_builder_theme($existing, $type, $theme, $path) {
+  return [
+    'template_task_legend' => [
+      'variables' => [
+        'var1' => 0,
+      ],
+    ],
+  ];
+}
+
+/**
+ * Implements hook_library_info_build().
+ */
+function maestro_template_builder_library_info_build() {
+  $config = \Drupal::config('maestro_template_builder.settings');
+
+  if ($config->get('maestro_template_builder_local_library')) {
+    $libraries['maestro_raphael'] = [
+      'js' => [
+        '/libraries/raphael/raphael.js' => [],
+        'js/template-display.js' => [],
+      ],
+      'dependencies' => [
+        'core/jquery',
+        'core/drupal',
+        'core/drupalSettings',
+        'core/jquery.once',
+        'core/drupal.dialog.ajax',
+      ],
+    ];
+  }
+  else {
+    $default = $config->get('maestro_template_builder_remote_library_location');
+    $cdn = isset($default) ? $default : '//cdnjs.cloudflare.com/ajax/libs/raphael/2.2.7/raphael.js';
+    $libraries['maestro_raphael'] = [
+      'js' => [
+        $cdn => ['external' => TRUE],
+        'js/template-display.js' => [],
+      ],
+      'dependencies' => [
+        'core/jquery',
+        'core/drupal',
+        'core/drupalSettings',
+        'core/jquery.once',
+        'core/drupal.dialog.ajax',
+      ],
+    ];
+  }
+
+  return $libraries;
+}

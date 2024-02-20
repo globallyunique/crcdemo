@@ -1,0 +1,9 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - profile
+id: profile.add_contact
+label: 'Add Contact'
+targetEntityType: profile
+cache: true

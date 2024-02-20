@@ -1,0 +1,10 @@
+redirect_user_page: false
+unified_login_register: false
+access_denied_redirect: false
+coupled_real_name: true
+add_contact_form_type: current
+email_required_roles: {  }
+default_contacts_dashboard_route: contacts.collection.individual
+expanded_facet_blocks:
+  - 'facet_block:crm_roles'
+  - 'facet_block:crm_type'

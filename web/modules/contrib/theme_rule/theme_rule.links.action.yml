@@ -1,0 +1,5 @@
+theme_rule.rule_add:
+  route_name: theme_rule.rule_add
+  title: 'Add theme rule'
+  appears_on:
+    - entity.theme_rule.collection

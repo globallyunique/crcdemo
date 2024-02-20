@@ -1,0 +1,52 @@
+<?php
+
+/**
+ * @file
+ * Module related hook implementations for the contacts_log module.
+ */
+
+use Drupal\profile\Entity\Profile;
+use Drupal\simplenews\SubscriberInterface;
+use Drupal\user\Entity\User;
+
+/**
+ * Implements hook_ENTITY_TYPE_insert() for profile.
+ */
+function contacts_log_profile_insert(Profile $profile) {
+  \Drupal::service('contacts_log.profile_logger')->onInsert($profile);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_update() for profile.
+ */
+function contacts_log_profile_update(Profile $profile) {
+  \Drupal::service('contacts_log.profile_logger')->onUpdate($profile);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert() for user.
+ */
+function contacts_log_user_insert(User $user) {
+  \Drupal::service('contacts_log.user_logger')->onInsert($user);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_update() for user.
+ */
+function contacts_log_user_update(User $user) {
+  \Drupal::service('contacts_log.user_logger')->onUpdate($user);
+}
+
+/**
+ * Implements hook_simplenews_subscriber_insert().
+ */
+function contacts_log_simplenews_subscriber_insert(SubscriberInterface $subscriber) {
+  \Drupal::service('contacts_log.simplenews_logger')->postSave($subscriber);
+}
+
+/**
+ * Implements hook_simplenews_subscriber_update().
+ */
+function contacts_log_simplenews_subscriber_update(SubscriberInterface $subscriber) {
+  \Drupal::service('contacts_log.simplenews_logger')->postSave($subscriber, $subscriber->original ?? NULL);
+}

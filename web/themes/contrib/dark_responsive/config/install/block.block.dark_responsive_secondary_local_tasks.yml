@@ -1,0 +1,22 @@
+uuid: c0dc2445-2260-4ecb-97e6-18e0a57a1735
+langcode: en
+status: true
+dependencies:
+  theme:
+    - dark_responsive
+_core:
+  default_config_hash: 2L0geP-ixCbCkEpW6BVF6H7vDUZN4ea07_Y9CociQm4
+id: dark_responsive_secondary_local_tasks
+theme: dark_responsive
+region: auto_hidden_block
+weight: -1
+provider: null
+plugin: local_tasks_block
+settings:
+  id: local_tasks_block
+  label: 'Secondary tabs'
+  label_display: '0'
+  provider: core
+  primary: false
+  secondary: true
+visibility: {  }

@@ -1,0 +1,99 @@
+<?php
+
+/**
+ * @file
+ * Contains Contacts Mapping.
+ */
+
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\profile\Entity\ProfileInterface;
+use Drupal\user\UserInterface;
+
+/**
+ * Implements hook_ENTITY_TYPE_update() for profile.
+ */
+function contacts_mapping_profile_update(EntityInterface $entity) {
+  /** @var \Drupal\profile\Entity\ProfileInterface $entity */
+  if ($entity->isDefault()) {
+    $user = $entity->getOwner();
+    if (_contacts_mapping_profile_map_update($user, $entity)) {
+      $user->save();
+    }
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_presave() for user.
+ */
+function contacts_mapping_user_presave(EntityInterface $entity) {
+  /** @var \Drupal\user\UserInterface $entity */
+  // @todo Potentially allow all profiles or build configuration.
+  foreach (['crm_indiv', 'crm_org'] as $profile_type) {
+    if ($entity->hasField("profile_{$profile_type}") && !$entity->get("profile_{$profile_type}")->isEmpty()) {
+      /** @var \Drupal\Core\Field\EntityReferenceFieldItemList $field_list */
+      $field_list = $entity->get("profile_{$profile_type}");
+      foreach ($field_list->referencedEntities() as $profile) {
+        if ($profile->isDefault()) {
+          _contacts_mapping_profile_map_update($entity, $profile);
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Post save operation for profile entity.
+ *
+ * @see contacts_mapping_user_presave()
+ * @see contacts_mapping_profile_update()
+ */
+function _contacts_mapping_profile_map_update(UserInterface $user, ProfileInterface $profile) {
+  if (!$profile->hasField('geolocation_geocoded')) {
+    return FALSE;
+  }
+
+  $original = $profile->original;
+
+  // If the field is empty and there is no original value do nothing.
+  if (!$original && $profile->get('geolocation_geocoded')->isEmpty()) {
+    return FALSE;
+  }
+
+  $geofield = $user->get('geolocation');
+  // If we have the original entity check for changes.
+  // If the user field is empty it does not matter if the profile data hasn't
+  // changed.
+  if (!$geofield->isEmpty() && $original && $profile->geolocation_geocoded->value == $original->geolocation_geocoded->value) {
+    return FALSE;
+  }
+
+  // Fetch geo data from source fields.
+  /** @var \Drupal\contacts_mapping\Plugin\Field\FieldType\GeofieldItemList $geofield */
+  return $geofield->updateGeoFromSource();
+}
+
+/**
+ * Implements hook_field_formatter_info_alter().
+ *
+ * Allow all geofield formatters to be used by geofield_override.
+ */
+function contacts_mapping_field_formatter_info_alter(array &$info) {
+  foreach ($info as &$type) {
+    if (in_array('geofield', $type['field_types'])) {
+      $type['field_types'][] = 'geofield_override';
+    }
+  }
+}
+
+/**
+ * Implements hook_field_widget_info_alter().
+ *
+ * Allow all geofield widgets to be used by geofield_override.
+ */
+function contacts_mapping_field_widget_info_alter(array &$info) {
+  foreach ($info as &$type) {
+    if (in_array('geofield', $type['field_types'])) {
+      $type['field_types'][] = 'geofield_override';
+    }
+  }
+}

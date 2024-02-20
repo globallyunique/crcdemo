@@ -1,0 +1,195 @@
+<?php
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\maestro\Engine\MaestroEngine;
+use Drupal\node\Entity\Node;
+use Drupal\Core\Url;
+
+use Drupal\Core\File\FileSystemInterface;
+use Drupal\webform\Entity\Webform;
+use Symfony\Component\Yaml\Yaml;
+use Drupal\Core\StreamWrapper\PublicStream;
+
+// mv - direct to different pages
+const EVENTS = 1;
+const CHECKLIST = 2;
+
+function custom_patient_redirection_submit_handler(array &$form, FormStateInterface $form_state) {
+
+    $patient_node = $form_state->getFormObject()->getEntity();
+    $process_id = setup_new_patient($patient_node);
+    $patient_node_id = $patient_node->id();
+
+    $url = ''; 
+    $direct_to = EVENTS;
+
+    if ($direct_to == CHECKLIST) {
+        $url = Url::fromUri('internal:/taskconsole/'. $patient_node_id . '/' . $process_id);
+        \Drupal::logger('custom_patient_redirection_submit_handler')->info('Redirecting to checklist: ' . $url->toString());
+    } elseif ($direct_to == EVENTS) {
+        $url = Url::fromUri('internal:/events/' . $patient_node_id);
+        \Drupal::logger('custom_patient_redirection_submit_handler')->info('Redirecting to events: ' . $url->toString());
+    }
+
+    // Redirect if URL is set
+    if ($url != '') {
+        $form_state->setRedirectUrl($url);
+    } else {
+        \Drupal::logger('custom_patient_redirection_submit_handler')->error('URL not set. direct_to value: ' . $direct_to);
+    }
+}
+
+function patient_view_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
+  $form_ids = ['node_patient_form','node_patient_edit_form']; 
+  if (in_array($form_id, $form_ids)) {
+    \Drupal::logger('patient_view_form_alter')->info('altering:' . $form_id);
+    // Change the label for form
+    $form['title']['widget'][0]['value']['#title'] = "Name";
+    // Hide Preview button
+    unset($form['actions']['preview']);
+    // Make submit button redirect to the Event page for the Patient
+    $form['actions']['submit']['#submit'][] = 'custom_patient_redirection_submit_handler';
+  }
+}
+
+function patient_view_node_insert(Node $entity) {
+  \Drupal::logger('patient_view_node_insert')->info('inserting:' . $entity->getType() . ' id:' . $entity->id());
+  if ($entity->bundle() == 'patient') {
+    \Drupal::logger('patient_view_node_insert')->info('bundle is patient');
+    // Query the Event nodes that reference the partially created Patient node.
+    $query = \Drupal::entityQuery('node')
+      ->condition('type', 'event')
+      ->accessCheck(FALSE)
+      ->condition('field_patient_reference.target_id', $entity->id());
+    $patient_node_ids = $query->execute();
+
+    // Load the Event nodes and update the field_patient_reference.
+    $event_nodes = \Drupal\node\Entity\Node::loadMultiple($patient_node_ids);
+    foreach ($event_nodes as $event_node) {
+      // \Drupal::logger('patient_view_node_insert')->info('calling kint');
+      // kint($event_node->field_patient_reference->getValue());
+      // \Drupal::logger('patient_view_node_insert')->info('updating event:' . $event_node->id(). ' with patient:' . $entity->id());
+      $event_node->field_patient_reference->entity = $entity;
+      $event_node->save();
+    }
+  }
+}
+
+/*
+ - Add the study Events for a newly created patient.
+ - Start a workflow for the first Event.
+ - Save the workflow queue ID in a field on the node for the first Event.
+*/
+function setup_new_patient(Drupal\node\NodeInterface $patient_node) {
+
+  if ($patient_node->getType() == 'patient') {
+    \Drupal::logger('setup_new_patient')->info('inserting events for:' . $patient_node->getType() . ' id:' . $patient_node->id());
+    $study_nodes = $patient_node->get('field_study')->referencedEntities();
+    $study_node = $study_nodes[0];
+    \Drupal::logger('setup_new_patient')->info('study_nodes:' . print_r($study_nodes, TRUE));
+    $study_id = $study_node->get('field_id')->value;
+    \Drupal::logger('setup_new_patient')->info('study_id:' . $study_id);
+    $user_name = \Drupal::currentUser()->getAccountName();
+
+    $processId = getExistingWorflowFor($patient_node);
+    if (!isset($processId)) {
+      \Drupal::logger('setup_new_patient')->info('no existing workflow found for patient:' . $patient_node->id());
+      $process_id = setupWorkflow($study_id, $patient_node, $study_node, $user_name);
+
+      if ($process_id !== null) {
+        \Drupal::state()->set('sitehub.process_id', $process_id);
+        \Drupal::state()->set('sitehub.patient_id', $patient_node->id());
+        \Drupal::logger('checklist_view render')->info('saving to session patient_id: ' . $patient_node->id(). ' process_id: ' . $process_id);
+      }
+    } else {
+      \Drupal::logger('setup_new_patient')->info('patient: ' . $patient_node->id() . ' has a workflow with processid' . $process_id->id());
+    }
+    return $process_id;
+  }
+}
+
+function getExistingWorflowFor($patient_node) {
+  $query = \Drupal::entityQuery('node')
+    ->accessCheck(FALSE)
+    ->condition('type', 'event')
+    ->condition('field_patient_reference.target_id', $patient_node->id())
+    ->condition('field_pid', NULL, 'IS NOT NULL');
+  $event_node_ids = $query->execute();
+  if (count($event_node_ids) > 0) {
+    $event_node = \Drupal\node\Entity\Node::load(array_values($event_node_ids)[0]);
+    $process_id = $event_node->get('field_pid')->target_id;
+    \Drupal::logger('getExistingWorflowFor')->info('Found existing workflow pid:'. $process_id);
+    return $process_id;
+  }
+  return null;
+}
+
+function setupWorkflow($study_id, $patient_node, $study_node, $user_name) {
+  $study = strtolower($study_id);
+  $drupal_root = \Drupal::root();
+  $filePath = $drupal_root . '/config/' . $study . '/' . $study .'_events.yaml';
+
+  // Ensure the file exists
+  if (!file_exists($filePath)) {
+    \Drupal::logger('SetupWorkflow')->info('The specified file, @file, does not exist for study @study', [
+        '@file' => $filePath,
+        '@study' => $study_id,
+    ]);
+    return;
+  }
+
+  // Read and parse the YAML file using Drupal's wrapper function
+  $yamlContents = \Drupal\Component\Serialization\Yaml::decode(file_get_contents($filePath));
+  $number=0;
+
+  // first visit is today
+  $currentDate = time();
+  // Iterate over each period (like screening, treatment, etc.)
+  foreach ($yamlContents['periods'] as $periodKey => $period) {
+    // Iterate over each event in the period
+    foreach ($period['events'] as $eventKey => $event) {
+      $number++;
+      if ($number == 1) {
+        $event_node = setupEvent($patient_node, $period['label'], $event['label'], $currentDate, $event['workflow'], $user_name, $number);
+        $process_id = \Drupal\utility_functions\UtilityFunctions::startProcess($event['workflow'], $patient_node->id());
+        $event_node->set('field_pid', ['target_id' => $process_id]);
+        $event_node->save();
+        \Drupal::logger('setup_new_patient->setupWorkflow')->info('Saved started workflow pid:'. $process_id);
+      } else {
+        $currentDate = nextEvent($currentDate);
+        $event_node = setupEvent($patient_node, $period['label'], $event['label'], $currentDate, $event['workflow'], $user_name, $number);
+      }
+      \Drupal::logger('setup_new_patient->setupWorkflow')->info('Setting up @event on @date with workflow @workflow', [
+          '@event' => $event['label'],
+          '@date' => $currentDate,
+          '@workflow' => $event['workflow'],
+      ]);
+    }
+  }
+  return $process_id;
+}
+
+function setupEvent($patient_node, $epoch, $event_name, $event_date, $workflow_template_name, $user_name, $event_order_number) {
+  $fevent = date("Y-m-d", $event_date);
+  $new_event = Node::create([
+    'type' => 'event',
+    'title' => $event_name,
+    'field_epoch' => $epoch,
+    'field_event_date' => $fevent,
+    'field_patient_reference' => $patient_node,
+    'field_assigned' => $user_name,
+    'field_template_name' => $workflow_template_name,
+    'field_event_order_number' => $event_order_number,
+  ]);
+  $new_event->save();  
+  return $new_event;
+}
+
+function nextEvent($currentDate) {
+  $startDate = strtotime("+7 day", $currentDate);
+  $endDate = strtotime("+14 day", $startDate);
+  
+  // Generate a random timestamp between now and one month in the future
+  $randomTimestamp = rand($startDate, $endDate);
+  return $randomTimestamp;
+}

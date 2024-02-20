@@ -1,0 +1,12 @@
+name: File URL
+type: module
+description: Reference both local and remote files by URI.
+package: Custom
+core_version_requirement: ^8 || ^9 || ^10
+dependencies:
+  - drupal:file
+
+# Information added by Drupal.org packaging script on 2022-11-19
+version: '2.0.0-alpha2'
+project: 'file_url'
+datestamp: 1668872185

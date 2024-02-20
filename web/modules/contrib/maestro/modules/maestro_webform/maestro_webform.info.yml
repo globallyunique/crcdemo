@@ -1,0 +1,8 @@
+name: Maestro Webform Integration
+type: module
+description: Maestro Webform Integration Module.
+core_version_requirement: ^9.4 || ^10
+package: Maestro
+dependencies:
+  - webform:webform
+  - maestro:maestro

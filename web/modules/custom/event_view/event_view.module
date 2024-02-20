@@ -1,0 +1,16 @@
+<?php
+
+// Handle the store_value field in the view so it is displayed as a button
+// The button causes the route to the 'MyController::storeValue' method to be called and display the checklist view.
+function event_view_views_data_alter(&$data) {
+  \Drupal::logger('event_view_views_data_alter')->info('altered');
+  $data['node']['tasklist'] = [
+    'title' => t('Tasklist'),
+    'field' => [
+      'id' => 'store_value',
+      'title' => t('Tasklist'),
+      'handler' => 'Drupal\event_view\Plugin\views\field\StoreValue',
+      'click sortable' => FALSE,
+    ],
+  ];
+}

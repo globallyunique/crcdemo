@@ -1,0 +1,25 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - contacts
+    - system
+  theme:
+    - claro
+id: contacts_back_to_dashboard_link
+theme: claro
+region: sidebar_first
+weight: 0
+provider: null
+plugin: contacts_back
+settings:
+  id: contacts_back
+  label: 'Back to Search'
+  provider: contacts
+  label_display: '0'
+visibility:
+  request_path:
+    id: request_path
+    pages: '/admin/contacts/*'
+    negate: false
+    context_mapping: {  }

@@ -1,0 +1,6 @@
+event_view.store_value:
+  path: '/event-view/store-value/{event_node_id}'
+  defaults:
+    _controller: '\Drupal\event_view\Controller\MyController::storeValue'
+  requirements:
+    _permission: 'access content'

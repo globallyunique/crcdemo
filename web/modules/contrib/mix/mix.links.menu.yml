@@ -1,0 +1,11 @@
+mix.settings:
+  title: Mix
+  route_name: mix.settings
+  parent: system.admin_config
+  weight: 10
+
+mix.meta_settings:
+  title: Meta tags
+  parent: mix.settings
+  route_name: mix.meta_settings
+  weight: 10

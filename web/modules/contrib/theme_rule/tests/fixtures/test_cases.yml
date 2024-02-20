@@ -1,0 +1,68 @@
+# Order: rule_2, rule_3, rule_1
+all enabled:
+  rule_1:
+    theme: foo
+    status: true
+    weight: 100
+  rule_2:
+    theme: bar
+    status: true
+    weight: -100
+  rule_3:
+    theme: baz
+    status: true
+    weight: -50
+
+# Order: rule_2 (w/o conditions), rule_3, rule_1
+without conditions:
+  rule_1:
+    theme: foo
+    status: true
+    weight: 100
+  rule_2:
+    theme: bar
+    status: true
+    weight: -100
+    # No conditions.
+    conditions: {  }
+  rule_3:
+    theme: baz
+    status: true
+    weight: -50
+
+# Order: rule_2 (disabled), rule_3, rule_1
+with disabled:
+  rule_1:
+    theme: foo
+    status: true
+    weight: 100
+  rule_2:
+    theme: bar
+    # Disabled.
+    status: false
+    weight: -100
+  rule_3:
+    theme: baz
+    status: true
+    weight: -50
+
+# Order: rule_2 (disabled), rule_3 (w/o conditions), rule_4, rule_1
+without conditions and with disabled:
+  rule_1:
+    theme: foo
+    status: true
+    weight: 100
+  rule_2:
+    theme: bar
+    # Disabled.
+    status: false
+    weight: -100
+  rule_3:
+    theme: baz
+    status: true
+    weight: -50
+    # No conditions.
+    conditions: {  }
+  rule_4:
+    theme: qux
+    status: true

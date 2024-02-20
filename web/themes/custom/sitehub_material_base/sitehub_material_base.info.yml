@@ -1,0 +1,40 @@
+name: sitehub_material_base
+type: theme
+description: Sub theme based on Material base theme.
+core_version_requirement: ^9 || ^10
+
+base theme: material_base
+
+screenshot: screenshot.svg
+
+libraries:
+  - core/normalize
+  - material_base/base
+  - material_base/grid
+  - material_base/fonts
+  - material_base/icons-font
+  - sitehub_material_base/global-styling
+
+regions:
+  navbar: 'Navbar'
+  header: 'Header'
+  actions: 'Actions'
+  main_top: 'Main top'
+  content_above: 'Content above'
+  breadcrumb: 'Breadcrumb'
+  messages: 'Messages'
+  highlighted: Highlighted
+  help: 'Help'
+  content: 'Content'
+  content_secondary: 'Content secondary'
+  sidebar_first: 'Sidebar first'
+  sidebar_second: 'Sidebar second'
+  content_below: 'Content below'
+  main_bottom: 'Main bottom'
+  footer: 'Footer'
+  drawer: 'Drawer'
+  overlay: 'Overlay'
+
+regions_hidden:
+  page_bottom: 'Page bottom'
+  page_top: 'Page top'

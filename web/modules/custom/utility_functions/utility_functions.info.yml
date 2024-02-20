@@ -1,0 +1,7 @@
+name: 'utility_functions'
+type: module
+description: 'Functions shared by this projects custom modules'
+package: Custom
+core_version_requirement: ^10
+dependencies:
+  - maestro:maestro

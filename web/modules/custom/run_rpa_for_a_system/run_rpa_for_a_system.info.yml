@@ -1,0 +1,4 @@
+name: Run RPA for a System
+description: A module to run RPA for a system.
+core_version_requirement: ^10
+type: module

@@ -1,0 +1,8 @@
+name: Maestro Task Console
+description: Default Task Console for use with Maestro.
+core_version_requirement: ^9.4 || ^10
+package: Maestro
+type: module
+scripts:
+dependencies:
+  - maestro:maestro

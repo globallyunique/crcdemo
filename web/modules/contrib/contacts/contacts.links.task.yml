@@ -1,0 +1,9 @@
+contacts.collection.individual:
+  route_name: contacts.collection.individual
+  title: 'People'
+  base_route: contacts.collection.individual
+
+contacts.collection.organisation:
+  route_name: contacts.collection.organisation
+  title: 'Organisations'
+  base_route: contacts.collection.individual

@@ -1,0 +1,83 @@
+/* Custom style to prevent carousel from being distorted 
+if for some reason image doesn't load */
+.carousel-item {
+	min-height: 280px;
+}
+
+.navbar {
+	min-height: 86px;
+}
+
+.navbar .site-logo img {
+	background-color: white;
+	width: 60px;
+	color: white;
+	border-radius: 100%;
+
+}
+
+.toolbar-tray-open .fixed-top {
+	position: fixed;
+	top: 79px;
+	right: 0;
+	left: 0;
+	z-index: 450;
+}
+.fixed-top {
+	z-index: 450 !important;
+}
+
+.offcanvas-body {
+	display: flex;
+	justify-content: end;
+}
+.navbar ul li a{
+	text-decoration:none;
+	color: white;
+	padding: 20px;
+}
+
+.navbar ul li a:focus,
+.navbar ul li a:hover {
+	color: orange !important;
+}
+
+.carousel-caption {
+	top: 40% !important;
+}
+
+.carousel-caption h2 {
+	font-size: 86px;
+	text-transform: capitalize;
+}
+
+.carousel-caption .slider-description {
+	font-size: 30px;
+
+}
+
+/* Footer */
+footer {
+	background-color: black;
+}
+
+ul.social.list-inline {
+	display: flex;
+	padding: 35px;
+	justify-content: center;
+	color: white;
+	font-size: 40px;
+}
+
+ul.social.list-inline a {
+    color: #DADFE1;
+    border: 1px solid #DADFE1;
+    font-size: 20px;
+    padding: 10px;
+    vertical-align: middle;
+}
+/* Copyright Text */
+.copyright-text {
+	color: white;
+	text-align: center;
+}

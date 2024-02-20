@@ -1,0 +1,23 @@
+uuid: f294bfc0-3a17-417f-9065-5286a5cc9a0d
+langcode: en
+status: true
+dependencies:
+  module:
+    - system
+  theme:
+    - dark_responsive
+id: dark_responsive_sitebranding
+theme: dark_responsive
+region: header
+weight: 0
+provider: null
+plugin: system_branding_block
+settings:
+  id: system_branding_block
+  label: 'Site branding'
+  label_display: '0'
+  provider: system
+  use_site_logo: true
+  use_site_name: false
+  use_site_slogan: false
+visibility: {  }

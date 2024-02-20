@@ -1,0 +1,16 @@
+{
+  "name": "drupal/gcal_entity",
+  "type": "drupal-module",
+  "description": "Integrate GCal as an Entity",
+  "keywords": ["Drupal"],
+  "license": "GPL-2.0+",
+  "homepage": "https://www.drupal.org/project/gcal_entity",
+  "minimum-stability": "dev",
+  "support": {
+    "issues": "https://www.drupal.org/project/issues/gcal_entity",
+    "source": "http://cgit.drupalcode.org/gcal_entity"
+  },
+  "require": {
+      "google/apiclient": "^2.2"
+  }
+}

@@ -1,0 +1,41 @@
+<?php
+
+/**
+ * @file
+ * Module install/update related hooks.
+ */
+
+use Drupal\field\Entity\FieldConfig;
+
+/**
+ * Clean database dummy readonly html field data.
+ */
+function readonly_html_field_update_9001(&$sandbox) {
+  /** @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entityTypeBundleInfo */
+  $entityTypeBundleInfo = Drupal::service('entity_type.bundle.info');
+  /** @var \Drupal\Core\Entity\EntityFieldManagerInterface $entityFieldManager */
+  $entityFieldManager = \Drupal::service('entity_field.manager');
+  $entityTypeInfos = $entityTypeBundleInfo->getAllBundleInfo();
+  $database = Drupal::database();
+  foreach ($entityTypeInfos as $entity_type => $bundles) {
+    foreach ($bundles as $bundle => $bundle_info) {
+      try {
+        $fields = $entityFieldManager->getFieldDefinitions($entity_type, $bundle);
+      }
+      catch (LogicException $e) {
+        continue;
+      }
+      $fields = array_filter($fields, function ($field) {
+        return $field instanceof FieldConfig && $field->getType() === 'readonly_html_field';
+      });
+      if (!empty($fields)) {
+        foreach ($fields as $field) {
+          $field_name = $field->getName();
+          $table_name = $entity_type . '__' . $field_name;
+          $database->query("DELETE FROM $table_name")
+            ->execute();
+        }
+      }
+    }
+  }
+}

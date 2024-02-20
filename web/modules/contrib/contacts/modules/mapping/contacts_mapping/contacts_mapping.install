@@ -1,0 +1,93 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the contacts_mapping module.
+ */
+
+use Drupal\Core\Url;
+use Drupal\geocoder\Entity\GeocoderProvider;
+
+/**
+ * Implements hook_install().
+ */
+function contacts_mapping_install() {
+
+  // Add Contacts Mapping block to the contacts dashboard.
+  /** @var \Drupal\contacts\Entity\ContactTabInterface $tab */
+  if ($tab = \Drupal::entityTypeManager()->getStorage('contact_tab')->load('summary')) {
+    $tab->setBlock('contacts_geofield_map_user_user', [
+      "id" => "contacts_geofield_map:user:user",
+      "name" => "contacts_geofield_map_user_user",
+      "label" => "Contacts Location",
+      "provider" => "contacts_mapping",
+      "label_display" => "visible",
+      "geo_field" => "geolocation",
+      "region" => "left",
+      "weight" => 2,
+      "context_mapping" => [
+        "entity" => "user",
+      ],
+    ]);
+    $tab->save();
+  }
+
+  // Update the field settings if the site is not using Google for geocoding.
+  $providers = GeocoderProvider::loadMultiple();
+
+  /** @var \Drupal\Core\Field\FieldConfigInterface $field */
+  foreach (\Drupal::entityTypeManager()->getStorage('field_config')->loadByProperties(['field_name' => 'geolocation_geocoded']) as $field) {
+    if ($third_party = $field->getThirdPartySettings('geocoder_field')) {
+      if (count($third_party['providers']) == 1 && $third_party['providers'][0] == 'googlemaps') {
+        if (!array_key_exists('googlemaps', $providers)) {
+          $field->setThirdPartySetting('geocoder_field', 'providers', array_keys($providers));
+          $field->save();
+
+          \Drupal::messenger()->addMessage(t('Profile fields have been added to store locations geocoded using your current Geocoder Providers. You can amend these settings at <a href="@link">@link</a>.', [
+            '@link' => Url::fromRoute('entity.profile_type.collection')->setAbsolute()->toString(),
+          ]));
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function contacts_mapping_uninstall($is_syncing) {
+
+  // If we don't delete the map from the summary, the dependency on this module
+  // will cause the tab to be deleted by core, which then breaks the display of
+  // any Contacts retained on the site.
+  /** @var \Drupal\contacts\Entity\ContactTabInterface $tab */
+  if ($tab = \Drupal::entityTypeManager()->getStorage('contact_tab')->load('summary')) {
+    if ($blocks = $tab->getBlocks()) {
+      if (array_key_exists('contacts_geofield_map_user_user', $blocks)) {
+        unset($blocks['contacts_geofield_map_user_user']);
+        $tab->setBlocks($blocks);
+        $tab->save();
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_requirements().
+ */
+function contacts_mapping_requirements($phase): array {
+  $requirements = [];
+  if ($phase == 'runtime') {
+    if (!$providers = GeocoderProvider::loadMultiple()) {
+      $requirements['contacts_mapping'] = [
+        'title' => t('Geocoder Providers'),
+        'description' => t('You must configure at least one Geocoder Provider at <a href="@link">@link</a> before you enable this module.', [
+          '@link' => Url::fromRoute('entity.geocoder_provider.collection')->setAbsolute()->toString(),
+        ]),
+        'severity' => REQUIREMENT_ERROR,
+      ];
+    }
+  }
+
+  return $requirements;
+}

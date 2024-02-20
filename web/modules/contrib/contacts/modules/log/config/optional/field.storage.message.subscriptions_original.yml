@@ -1,0 +1,19 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - message
+    - simplenews
+id: message.subscriptions_original
+field_name: subscriptions_original
+entity_type: message
+type: entity_reference
+settings:
+  target_type: simplenews_newsletter
+module: core
+locked: false
+cardinality: -1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

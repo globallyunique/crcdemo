@@ -1,0 +1,107 @@
+<?php
+
+/**
+ * @file
+ * Install related hook implementations for the contacts module.
+ */
+
+use Drupal\Core\Database\Database;
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
+
+/**
+ * Implements hook_schema().
+ */
+function contacts_schema() {
+  $schema['contacts_duplicate_exclusions'] = [
+    'description' => 'Users excluded from deduplication.',
+    'fields' => [
+      'uid1' => [
+        'type' => 'int',
+        'not null' => TRUE,
+      ],
+      'uid2' => [
+        'type' => 'int',
+        'not null' => TRUE,
+      ],
+    ],
+    'primary key' => ['uid1', 'uid2'],
+  ];
+  return $schema;
+}
+
+/**
+ * Implements hook_install().
+ */
+function contacts_install($is_syncing) {
+  drupal_flush_all_caches();
+
+  if (!$is_syncing) {
+    /** @var \Drupal\Core\Extension\ThemeHandler $theme_handler */
+    $theme_handler = \Drupal::service('theme_handler');
+
+    if (!$theme_handler->themeExists('contacts_theme')) {
+      // If the theme is in the filesystem but not installed, install it.
+      if (isset($theme_handler->rebuildThemeData()['contacts_theme'])) {
+        /** @var \Drupal\Core\Extension\ThemeInstallerInterface $theme_installer */
+        $theme_installer = \Drupal::service('theme_installer');
+        $theme_installer->install(['contacts_theme']);
+      }
+    }
+
+    // Install additional sub-modules by default.
+    /** @var \Drupal\Core\Extension\ModuleInstaller $module_installer */
+    $module_installer = \Drupal::service('module_installer');
+    $module_installer->install(['contacts_group']);
+  }
+}
+
+/**
+ * Add duplicate_exclusions.
+ */
+function contacts_update_8001() {
+  $table = [
+    'description' => 'Users excluded from deduplication.',
+    'fields' => [
+      'uid1' => [
+        'type' => 'int',
+        'not null' => TRUE,
+      ],
+      'uid2' => [
+        'type' => 'int',
+        'not null' => TRUE,
+      ],
+    ],
+    'primary key' => ['uid1', 'uid2'],
+  ];
+  $schema = Database::getConnection()->schema();
+  $schema->createTable('contacts_duplicate_exclusions', $table);
+}
+
+/**
+ * Pseudo-email field configuration.
+ */
+function contacts_update_8002() {
+  // Email should be required for the crm_indiv profile/role.
+  \Drupal::configFactory()
+    ->getEditable('contacts.configuration')
+    ->set('email_required_roles', ['crm_indiv'])
+    ->save();
+
+  // Add the email into the Add Contact form displays for crm_org/crm_indiv.
+  /** @var \Drupal\Core\Entity\Entity\EntityFormDisplay $form_display */
+  $form_display = EntityFormDisplay::load('profile.crm_indiv.add_contact');
+  if ($form_display) {
+    $form_display->setComponent('contacts_mail', [
+      'weight' => -1,
+    ]);
+    $form_display->save();
+  }
+
+  $form_display = EntityFormDisplay::load('profile.crm_org.add_contact');
+  if ($form_display) {
+    $form_display->setComponent('contacts_mail', [
+      'weight' => -1,
+    ]);
+    $form_display->save();
+  }
+}

@@ -1,0 +1,36 @@
+<?php
+
+//TODO: Determine why this doesn't work
+
+/**
+ * Implements hook_theme_suggestions_HOOK_alter() for form templates.
+ */
+function hook_theme_suggestions_node_edit_form_alter(array &$suggestions, array $variables) {
+  // Define the form ID of the node edit form.
+  $node_edit_forms = ['node_page_form', 'node_article_form'];  // Replace with your node types.
+  \Drupal::logger('sitehub_material_base_theme_suggestions_form_alter')->info('Entered');
+  \Drupal::logger('sitehub_material_base_theme_suggestions_form_alter')->info('form_id:' . $variables['element']['#id']);
+
+  if (in_array($variables['element']['#id'], $node_edit_forms)) {
+    $suggestions[] = 'node_edit_form';
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function sitehub_material_base_theme($existing, $type, $theme, $path) {
+  \Drupal::logger('sitehub_material_base_theme')->info('Entered');
+  return [
+    'form__node_page_form' => [
+      'render element' => 'form',
+      'template' => 'form--node-page-form',
+      'base hook' => 'form',
+    ],
+    'form__node_article_form' => [
+      'render element' => 'form',
+      'template' => 'form--node-article-form',
+      'base hook' => 'form',
+    ],
+  ];
+}

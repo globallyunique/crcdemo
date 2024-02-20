@@ -1,0 +1,7 @@
+name: Event View
+type: module
+description: 'Support for the Event View behaviors.'
+core_version_requirement: ^10
+package: Custom
+dependencies:
+  - views

@@ -1,0 +1,20 @@
+uuid: cc13bc44-4abc-4160-bc36-e0c76525404c
+langcode: en
+status: true
+dependencies:
+  theme:
+    - dark_responsive
+_core:
+  default_config_hash: CdXfDmRgAvms7EQovxxWPdYi0GitxeRbVtScYK16ZH0
+id: dark_responsive_local_actions
+theme: dark_responsive
+region: auto_hidden_block
+weight: 1
+provider: null
+plugin: local_actions_block
+settings:
+  id: local_actions_block
+  label: 'Primary admin actions'
+  label_display: '0'
+  provider: core
+visibility: {  }

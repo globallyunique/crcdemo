@@ -1,0 +1,25 @@
+{#
+/**
+ * @file gcal_entity.html.twig
+ * Default theme implementation to present GCal Entity data.
+ *
+ * This template is used when viewing GCal Entity pages.
+ *
+ *
+ * Available variables:
+ * - content: A list of content items. Use 'content' to print all content, or
+ * - attributes: HTML attributes for the container element.
+ *
+ * @see template_preprocess_gcal_entity()
+ *
+ * @ingroup themeable
+ */
+#}
+<div{{ attributes.addClass('gcal_entity') }}>
+  {% if children %}
+    {{ children.name }}
+  {% endif %}
+  {%  if events %}
+    {{ events }}
+  {% endif %}
+</div>

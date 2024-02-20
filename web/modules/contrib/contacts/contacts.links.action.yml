@@ -1,0 +1,46 @@
+contacts.contact_create_group:
+  route_name: <current>
+  title: 'Create'
+  appears_on:
+    - contacts.collection
+    - contacts.contact
+  options:
+    is_action_group: true
+    attributes:
+      title: 'Create'
+      class:
+        - 'button'
+        - 'button-action'
+        - 'action-group-control-create'
+
+contacts.contact_add_indiv:
+  # Implements the 'Add Individual' button
+  route_name: contacts.add_indiv_form
+  class: 'Drupal\contacts\AddContactAction'
+  appears_on:
+    - contacts.collection.individual
+    # For backwards compat, also show on the old contacts.collection route.
+    - contacts.collection
+    - contacts.collection.all
+  options:
+    action_group: contacts.contact_create_group
+    load_title_from_role: crm_indiv
+
+contacts.contact_add_org:
+  # Implements the 'Add Organisation' button
+  route_name: contacts.add_org_form
+  class: 'Drupal\contacts\AddContactAction'
+  appears_on:
+    - contacts.collection.organisation
+    # For backwards compat, also show on the old contacts.collection route.
+    - contacts.collection
+    - contacts.collection.all
+  options:
+    action_group: contacts.contact_create_group
+    load_title_from_role: crm_org
+
+contacts.contact_tab_add:
+  route_name: entity.contact_tab.add_form
+  title: 'Add Tab'
+  appears_on:
+    - entity.contact_tab.collection

@@ -1,0 +1,13 @@
+custom_commands.delete_all_workflows:
+  path: '/delete-all-workflows'
+  defaults:
+    _controller: '\Drupal\custom_commands\Controller\WorkflowController::deleteAllWorkflows'
+  requirements:
+    _permission: 'access content'
+
+custom_commands.reset_patients:
+  path: '/reset-patients'
+  defaults:
+    _controller: '\Drupal\custom_commands\Controller\WorkflowController::resetPatients'
+  requirements:
+    _permission: 'access content'

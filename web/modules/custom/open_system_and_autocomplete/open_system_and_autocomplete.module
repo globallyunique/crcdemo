@@ -1,0 +1,143 @@
+<?php
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\node\Entity\Node;
+use Drupal\Core\Url;
+use Drupal\maestro\Engine\MaestroEngine;
+use Drupal\utility_functions\UtilityFunctions;
+
+require "src/custom_breadcrumb.php";
+
+function open_system_and_autocomplete_get_content_types() {
+  return [];
+}
+
+function open_system_and_autocomplete_get_form_ids() {
+  $content_types = open_system_and_autocomplete_get_content_types();
+  $form_ids = [];
+
+  foreach ($content_types as $content_type) {
+    $form_ids[] = 'node_' . $content_type . '_form';
+  }
+
+  return $form_ids;
+}
+
+// REMOVE BECAUSE WE USE WEBFORMS
+//TODO: rename this to a generic module for changes to task forms rather than 'system a'
+function open_system_and_autocomplete_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
+  if ($form_id == 'views_exposed_form') {
+    return; // Hack to avoid excess of logging for this page which is passed whenever the log messages are shown.
+  }
+  \Drupal::logger('open_system_and_autocomplete_form_alter')->info('alter:' . $form_id);
+
+  $form_ids = open_system_and_autocomplete_get_form_ids(); 
+  $form_ids_edit = str_replace('_form', '_edit_form', $form_ids);
+  if (in_array($form_id, $form_ids) || in_array($form_id, $form_ids_edit)  || strpos($form_id, 'node_task_') !== false) {
+    // \Drupal::logger('open_system_and_autocomplete_form_alter')->info('altered:' . $form_id);
+
+    // TODO: remove this after determining if we'll ever need to open tabs via javascript
+    // $form['#attached']['library'][] = 'open_system_and_autocomplete/open_in_new_tab';
+    // $form['#attributes']['class'][] = 'node-system-a-form';
+
+    $node = $form_state->getFormObject()->getEntity();
+    $content_type_machine_name = $node->getType();
+    $content_type_entity = \Drupal::entityTypeManager()->getStorage('node_type')->load($content_type_machine_name);
+    $content_type_label = $content_type_entity->label();
+    $form['#title'] = t($content_type_label);
+
+    $form['actions']['submit']['#value'] = t('Complete');
+    $form['actions']['submit']['#submit'] = ['form_submit_redirect_to_checklist'];
+    // Hide Title
+    $form['title']['#access'] = FALSE;
+    $form['title']['widget'][0]['value']['#value'] = $form_id . ': ' . crc32(uniqid());
+  }
+  if ($form_id == 'node_vital_signs_form') {   
+    // Add placeholder for RPA button
+    $form['actions']['run_rpa_button'] = [
+      '#type' => 'submit',
+      '#value' => t('Copy into EDC'),
+      '#weight' => -3,
+    ];
+  }
+}
+
+
+// START THE CHECKLIST WORKKFLOW FROM THE LIST
+
+function form_submit_redirect_to_checklist($form, \Drupal\Core\Form\FormStateInterface $form_state) {
+  $queueID = intval(\Drupal::request()->query->get('queueid', 0));  //this may not exist
+  if ($queueID == 0) {
+    $token = \Drupal::request()->query->get('queueid_or_token'); 
+    \Drupal::logger('open_system_and_autocomplete_form_alter_form_submit_redirect_to_checklist')->info('token:' . $token);
+    $queueID = MaestroEngine::getQueueIdFromToken($token);
+  }
+  // \Drupal::logger('open_system_and_autocomplete_form_alter_form_submit_redirect_to_checklist')->info('queueID:' . $queueID);
+  $triggering_element = $form_state->getTriggeringElement();
+
+  $processID = MaestroEngine::getProcessIdFromQueueId($queueID);
+  if ($triggering_element['#value'] !== 'Save and Edit Later') {
+    MaestroEngine::completeTask($queueID, \Drupal::currentUser()->id());
+  }
+  UtilityFunctions::orchestrate();
+
+  $patient_node_id = MaestroEngine::getProcessVariable('patient_node_id', $processID);
+  if($patient_node_id == FALSE) {
+    \Drupal::logger('open_system_and_autocomplete_form_alter_form_submit_redirect_to_checklist')->error('patient_node_id is FALSE');
+  }
+  $checklist_url = 'internal:/taskconsole/' . $patient_node_id. '/'. $processID. '/0';
+  $url = Url::fromUri($checklist_url)->toString();
+  // \Drupal::logger('open_system_and_autocomplete_form_alter_form_submit_redirect_to_checklist')->info('Redirecting:'. $form['#form_id']. ' to:'. $checklist_url);  
+  $form_state->setRedirectUrl(Url::fromUri($checklist_url));
+}
+
+
+function get_process_id_from_queue_id($queue_id) {
+  $engine = new MaestroEngine();
+  $queue_record = $engine->getQueueEntryById($queue_id);
+
+  if ($queue_record) {
+    return $queue_record->process_id->target_id;
+  }
+
+  return NULL;
+}
+
+function open_system_and_autocomplete_maestro_task_console_alter_execution_link(&$execute_link, $taskTemplate, $queueRecord, $templateMachineName) {
+  // During task console rendering, you can alter the execution link.
+  //Provides full task and queue information for alteration
+  \Drupal::logger('open_system_and_autocomplete_maestro_task_console_alter_execution_link')->info('execute_link:' . print_r($execute_link, TRUE));
+}
+
+// Provide or alter your own execution URL in the task console.
+// The last parameter of $url_type will either be 'internal' or 'function' allowing you to decipher 
+// if the URL is function generated or is a direct URL to a Drupal route
+// For example, 'internal' will be a link used by the Content Type task for editing a content type as the route is a proper Drupal route.
+// If 'function' the route is not a routable Drupal URL and is therefore deciphered by the Maestro task execution middleware.
+function open_system_and_autocomplete_maestro_task_console_interactive_url_alter(&$handler, &$query_options, $taskTemplate, $queueRecord, $templateMachineName, $url_type) {
+  // During task console rendering, you can alter the URL to a task
+  //Provides full task and queue information for alteration
+  \Drupal::logger('open_system_and_autocomplete_maestro_task_console_interactive_url_alter')->info('handler:' . print_r($handler, TRUE));
+}
+
+
+
+// We provide an invokation here to allow other modules to inject their own custom information into the task display.
+// This hook fires as the task row is being rendered.  
+// The custom information will appear as a custom information bar surrounded by a DIV with class="custom-information"
+// This bar will appear directly above the views-based task information expansion area.
+function open_system_and_autocomplete_maestro_task_console_custominformation_alter(&$customInformation, $taskTemplate, $queueRecord, $templateMachineName) {
+  //set $customInformation with the desired customized text/structure you wish to show in the console's task row.
+  \Drupal::logger('open_system_and_autocomplete_maestro_task_console_custominformation_alter')->info('customInformation:' . print_r($customInformation, TRUE));
+}
+
+// Complete the task, but we'll also flag it as TASK_STATUS_CANCEL
+// Let the devs manage the submission as well
+// Fires in the handleExecuteSubmit method of the Maestro Webform Engine Task
+function open_system_and_autocomplete_maestro_webform_submission_set_cancel_completion_status($queueID, &$form, &$form_state, $triggeringElement, &$completeTask) {
+  //This method allows you to alter the $competeTask boolean flag.
+  //If you set the $completeTask boolean to FALSE, the task will not be completed and its status not set.
+  //You can complete and set the task status as you see fit in this hook.
+  \Drupal::logger('open_system_and_autocomplete_maestro_webform_submission_set_cancel_completion_status')->info('triggeringElement:' . print_r($triggeringElement, TRUE));
+  \Drupal::logger('open_system_and_autocomplete_maestro_webform_submission_set_cancel_completion_status')->info('form_state:' . print_r($form_state, TRUE));
+}

@@ -1,0 +1,22 @@
+uuid: 8cdd0f0e-4a6a-4dbd-af0a-393d728e506e
+langcode: en
+status: true
+dependencies:
+  module:
+    - system
+  theme:
+    - dark_responsive
+_core:
+  default_config_hash: a0Yyx1GeyKarZ4T_yXQBR_ZFKnXiFLtxAb6gWLd8nr0
+id: dark_responsive_content
+theme: dark_responsive
+region: content
+weight: 0
+provider: null
+plugin: system_main_block
+settings:
+  id: system_main_block
+  label: 'Main page content'
+  label_display: '0'
+  provider: system
+visibility: {  }

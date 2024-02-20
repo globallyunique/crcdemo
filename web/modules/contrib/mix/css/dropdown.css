@@ -1,0 +1,174 @@
+/* The wrapper out of ul element */
+.mix-dropdown-wrapper {
+  /* @see https://www.drupal.org/docs/theming-drupal/z-indexes-in-drupal-8 */
+  z-index: 200;
+  position: relative;
+}
+
+.mix-menu-toggle {
+  font-size: 28px;
+  display: none;
+}
+
+/* The ul element */
+.mix-dropdown {
+  position: relative;
+  display: flex;
+  padding: 0;
+  margin: 0;
+}
+
+.mix-dropdown li {
+  list-style: none;
+  flex-direction: column;
+  line-height: 40px;
+  position: relative;
+}
+
+.mix-dropdown li:hover {
+  background: #efefef;
+}
+
+/* Hide toggle by default */
+.mix-dropdown li .mix-dropdown-toggle {
+  display: none;
+}
+
+.mix-dropdown li .mix-icon-toggle {
+  padding: 0 0.5rem;
+}
+
+/* Hide dropdowns by default */
+.mix-dropdown li ul {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-top: 0px;
+  display: none;
+  list-style: none;
+  padding-left: initial;
+  position: absolute;
+  width: 120px;
+  padding: 0;
+  margin: 0;
+}
+
+.mix-dropdown li .menu-item {
+  display: flex;
+  width: 100%;
+}
+
+.mix-dropdown li .menu-item > a,
+.mix-dropdown li .menu-item > span,
+.mix-dropdown li .menu-item > button {
+  flex-grow: 1;
+  padding: 0 0.5rem;
+}
+
+.mix-dropdown li .menu-item-link {
+  display: block;
+}
+
+.mix-dropdown li .menu-item-link,
+.mix-dropdown li .menu-item-other {
+  padding: 0 0.5rem;
+  flex-grow: 1;
+}
+
+/* Hide dropdown toggles */
+.mix-menu-toggle-wrapper,
+.mix-dropdown-box [id^=mix-dropdown-toggle-] {
+  display: none;
+}
+
+.mix-dropdown-toggle {
+  display: inline-block;
+}
+
+/* Dropdown toggle symbol */
+.mix-icon-toggle:after {
+  /* Symboles: ▼ ⌵ ✚ */
+  content: " ⌵";
+}
+
+
+/* Display dropdowns on hover */
+.mix-dropdown li:hover > ul {
+  display: block;
+}
+
+@media all and (max-width : 768px) {
+
+  .mix-menu-toggle-wrapper {
+    display: flex;
+    justify-content: end;
+  }
+
+  .mix-dropdown-wrapper {
+    position: absolute;
+    right: 0;
+    min-width: 200px;
+  }
+
+  /* Hide the menu by default */
+  .mix-dropdown-wrapper {
+    display: none;
+    max-width: 100%;
+    border-top: 0px;
+    background-color: #fff;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+  }
+
+  .mix-dropdown li {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .mix-dropdown li .menu-item {
+    border-bottom: 1px solid #ddd;
+  }
+
+  .mix-dropdown li ul {
+    flex-basis: 100%;
+    display: none;
+    background-color: #eee;
+    border: 0;
+    position: static;
+  }
+
+  /* Hide dropdowns on hover (input unchecked) */
+  .mix-dropdown li:hover > ul {
+    display: none;
+  }
+
+  /* Show toggle in small screen */
+  .mix-dropdown li .mix-dropdown-toggle {
+    display: inline-block;
+  }
+
+  /* Dropdown toggle symbol */
+  .mix-dropdown .mix-icon-toggle:after {
+    /* Symboles: ▼ ⌵ ✚ */
+    content: "✚";
+  }
+
+  .mix-dropdown .mix-dropdown-toggle {
+    padding: 0 0.5rem;
+    border-left: 1px solid #ddd;
+  }
+
+  .mix-dropdown .mix-menu-toggle {
+    display: inline-block;
+    padding: 0 0.5rem;
+  }
+
+  /* Show dropdown when clicked on the label */
+  [id^=mix-dropdown-toggle-]:checked + .mix-dropdown-wrapper,
+  [id^=mix-dropdown-toggle-]:checked + .mix-dropdown-wrapper > ul,
+  [id^=mix-dropdown-toggle-]:checked + ul {
+    display: block !important;
+  }
+
+}

@@ -1,0 +1,10 @@
+name: Readonly Html Field
+description: Provides Readonly Html Field type.
+type: module
+core_version_requirement: ^8 || ^9 || ^10
+package: Field types
+
+# Information added by Drupal.org packaging script on 2023-08-18
+version: '1.0.4'
+project: 'readonly_html_field'
+datestamp: 1692374606

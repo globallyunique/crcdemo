@@ -1,0 +1,9 @@
+include:
+  - project: 'freelygive/drupal-gitlab-ci'
+    file: 'module.yml'
+
+# Enable automatic pushes to drupal.org.
+drupalorg_branch:
+  extends: .drupalorg_branch
+drupalorg_tags:
+  extends: .drupalorg_tags

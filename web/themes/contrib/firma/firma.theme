@@ -1,0 +1,271 @@
+<?php
+
+/**
+ * @file
+ * Contains theme override functions and preprocess functions
+ */
+
+use Drupal\Core\Template\RenderWrapper;
+use Drupal\Core\Template\Attribute;
+use Drupal\search\Form\SearchBlockForm;
+use Drupal\Component\Utility\SafeMarkup;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\system\Form\ThemeSettingsForm;
+use Drupal\file\Entity\File;
+use Drupal\Core\Url;
+use Drupal\file\Plugin\Core\Entity\FileInterface;
+use Drupal\block\Entity\Block;
+
+
+/**
+ * Implements hook_preprocess_page() for block templates.
+ */
+
+function firma_preprocess_page(&$variables) {
+
+  // Social media global variable.
+$variables['show_contact'] = theme_get_setting('show_contact');
+$variables['phone'] = theme_get_setting('phone');
+$variables['email'] = theme_get_setting('email');
+$variables['show_social_icon'] = theme_get_setting('show_social_icon');
+$variables['facebook_url'] = theme_get_setting('facebook_url');
+$variables['twitter_url'] = theme_get_setting('twitter_url');
+$variables['linkedin_url'] = theme_get_setting('linkedin_url');
+$variables['instagram_url'] = theme_get_setting('instagram_url');
+$variables['rss_url'] = theme_get_setting('rss_url');
+$variables['show_credit_link'] = theme_get_setting('show_credit_link');
+
+  // To get the current URL
+$current_url  = \Drupal::request()->getRequestUri();
+$current_path = explode("/", $current_url);
+$variables['current_path'] = $current_path[2];
+
+  // Slider
+  // Assign Variable for slider
+if ($variables['is_front']) {
+  if (theme_get_setting('show_slideshow','firma') == 1) {
+    $variables['show_slideshow'] = theme_get_setting('show_slideshow');
+    $variables['slideshow_animation'] = 'animation :' . theme_get_setting('slideshow_animation');
+    $variables['slideshow_autoplay'] = 'autoplay :' . theme_get_setting('slideshow_autoplay');
+    $variables['slideshow_ratio'] = 'ratio: ' . theme_get_setting('slideshow_ratio') . ';';
+    $variables['slider_content'] = firma_get_slider_content();
+  }
+}
+}
+
+/**
+ * Implements hook_preprocess_menu().
+ */
+function firma_preprocess_menu(&$variables, $hook) {
+  if ($hook == 'menu__main') { // We're doing that for main menu.
+    // Get the current path.
+  $current_path = \Drupal::request()->getRequestUri();
+  $items = $variables['items'];
+  foreach ($items as $key => $item) {
+      // If path is current_path, set active to li.
+    if ($item['url']->toString() == $current_path) {
+      // Add active link.
+      $variables['items'][$key]['attributes']['class'] = 'active';
+    }
+  }
+}
+}
+
+/**
+ * Slider
+ * Implements custom function for get slider content.
+ */
+function firma_get_slider_content() {
+  $slider_content = array();
+  for ($i = 1; $i <= theme_get_setting('no_of_slides'); $i++) {
+    $fid = theme_get_setting('slide_image_path'.$i,'firma');
+    if (!empty($fid)) {
+      $file = File::load($fid[0]);
+      $uri = $file->getFileUri();
+      $path = \Drupal::service('file_url_generator')->generateAbsoluteString($uri);
+    }
+    else {
+      $path = base_path() . \Drupal::service('extension.list.theme')->getPath('firma') . theme_get_setting('slide_image_path_' . $i, 'firma');
+    }
+    $slider_content[$i] = '<li>
+    <img uk-cover src="' . $path . '" alt="Slider Banner" />
+    <div class="uk-position-center uk-position-small uk-text-center uk-light">
+      <h2 class="uk-heading-small uk-text-bold uk-margin-remove-bottom">' . theme_get_setting('slide_title_' . $i, 'firma').'</h2>
+      <p class="uk-visible@m uk-text-large uk-align-center uk-width-1-3@m uk-margin-remove-top">' . theme_get_setting('slide_description_' . $i, 'firma').'</p>
+    </div>
+    </li>';
+  }
+  return $slider_content;
+}
+
+/**
+ * Implements hook_form_system_theme_settings_alter().
+ */
+function firma_form_system_theme_settings_alter(&$form, FormStateInterface $form_state) {
+
+  //Social Icon Link
+  $form['firma_settings']['contacts'] = [
+    '#type' => 'details',
+    '#title' => t('Contact Info'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  ];
+    $form['firma_settings']['contacts']['show_contact'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Show Contact Info'),
+    '#default_value' => theme_get_setting('show_contact'),
+  ];
+
+  $form['firma_settings']['contacts']['phone'] = [
+    '#type' => 'textfield',
+    '#title' => t('Phone Number'),
+    '#default_value' => theme_get_setting('phone'),
+  ];
+  $form['firma_settings']['contacts']['email'] = [
+    '#type' => 'textfield',
+    '#title' => t('E-mail Address'),
+    '#default_value' => theme_get_setting('email'),
+  ];
+  $form['firma_settings']['social_icon'] = [
+    '#type' => 'details',
+    '#title' => t('Social Media Link'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  ];
+  $form['firma_settings']['social_icon']['show_social_icon'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Show Social Icons'),
+    '#default_value' => theme_get_setting('show_social_icon'),
+  ];
+  $form['firma_settings']['social_icon']['facebook_url'] = [
+    '#type' => 'textfield',
+    '#title' => t('Facebook URL'),
+    '#default_value' => theme_get_setting('facebook_url'),
+  ];
+  $form['firma_settings']['social_icon']['twitter_url'] = [
+    '#type' => 'textfield',
+    '#title' => t('Twitter URL'),
+    '#default_value' => theme_get_setting('twitter_url'),
+  ];
+  $form['firma_settings']['social_icon']['linkedin_url'] = [
+    '#type' => 'textfield',
+    '#title' => t('LinkedIn URL'),
+    '#default_value' => theme_get_setting('linkedin_url'),
+  ];
+  $form['firma_settings']['social_icon']['instagram_url'] = [
+    '#type' => 'textfield',
+    '#title' => t('Instagram URL'),
+    '#default_value' => theme_get_setting('instagram_url'),
+  ];
+  $form['firma_settings']['social_icon']['instagram_url'] = [
+    '#type' => 'textfield',
+    '#title' => t('Youtube URL'),
+    '#default_value' => theme_get_setting('youtube_url'),
+  ];
+
+
+  //Slide show configure 
+  $form['firma_settings']['slideshow'] = [
+    '#type' => 'details',
+    '#title' => t('Front page slideshow.'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  ];
+  $form['firma_settings']['slideshow']['no_of_slides'] = [
+    '#type' => 'textfield',
+    '#title' => t('Number of slides'),
+    '#default_value' => theme_get_setting('no_of_slides'),
+    '#description'  => t("Enter the number of slides required & Save configuration."),
+    '#markup' => '<div class="messages messages--warning">Clear caches after making any changes in theme settings. <a href="../../config/development/performance">Click here to clear cache</a></div>',
+  ];
+  $form['firma_settings']['slideshow']['show_slideshow'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Show Slideshow'),
+    '#default_value' => theme_get_setting('show_slideshow'),
+    '#description'   => t("Show/Hide Slideshow in home page."),
+  ];
+  $form['firma_settings']['slideshow']['slideshow_autoplay'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Slideshow autoplay'),
+    '#default_value' => theme_get_setting('slideshow_autoplay'),
+    '#description'   => t("Slideshow autoplay on/off."),
+  ];
+  $form['firma_settings']['slideshow']['slideshow_animation'] = [
+    '#type' => 'select',
+    '#title' => t('Sideshow animation'),
+    '#default_value' => theme_get_setting('slideshow_animation'),
+    '#options' => [
+      'slide' => t('Slide'),
+      'fade' => t('Fade'),
+      'scale' => t('Scale'),
+      'pull' => t('Pull'),
+      'push' => t('Push'),
+    ],
+  ];
+    $form['firma_settings']['slideshow']['slideshow_ratio'] = [
+    '#type' => 'textfield',
+    '#title' => t('Slideshow ratio'),
+    '#default_value' => theme_get_setting('slideshow_ratio'),
+    '#description'   => t("Set slideshow ratio width:height."),
+
+  ];
+
+  $form['firma_settings']['slideshow']['slide'] = [
+    '#markup' => t('Change the banner image, title, description and link using below fieldset.'),
+  ];
+  
+  for ($i = 1; $i <= theme_get_setting('no_of_slides'); $i++) {
+    $form['firma_settings']['slideshow']['slide' . $i] = [
+      '#type' => 'details',
+      '#title' => t('Slide '.$i),
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+    ];
+    $form['firma_settings']['slideshow']['slide' . $i]['slide_image_path' . $i] = [
+      '#type' => 'managed_file',
+      '#title' => t('Slide '.$i.' Image'),
+      '#default_value' => theme_get_setting('slide_image_path'.$i,'firma'),
+      '#upload_location' => 'public://',
+    ];
+    $form['firma_settings']['slideshow']['slide' . $i]['slide_title_' . $i] = [
+      '#type' => 'textfield',
+      '#title' => t('Slide '.$i.' Title'),
+      '#default_value' => theme_get_setting('slide_title_' . $i,'firma'),
+    ];
+    $form['firma_settings']['slideshow']['slide' . $i]['slide_description_' . $i] = [
+      '#type' => 'textarea',
+      '#title' => t('Slide '.$i.' Description'),
+      '#default_value' => theme_get_setting('slide_description_' . $i,'firma'),
+    ];    
+    $form['firma_settings']['slideshow']['slide' . $i]['slide_url_' . $i] = [
+      '#type' => 'textfield',
+      '#title' => t('Slide '.$i.' URL'),
+      '#default_value' => theme_get_setting('slide_url_' . $i,'firma'),
+    ];
+
+    // Make the uploaded images permanent.
+    $image = theme_get_setting('slide_image_path'.$i,'firma');
+    if(!empty($image)){
+      $file = File::load($image[0]);
+      $file->status = \Drupal\file\FileInterface::STATUS_PERMANENT;
+      $file->save();
+      $file_usage = \Drupal::service('file.usage');
+      $file_usage_check = $file_usage->listUsage($file);
+      if (empty($file_usage_check)) {
+        $file_usage->add($file, 'firma', 'theme', $image[0]);
+      }
+    }
+
+  }
+}
+
+function firma_theme_suggestions_block_alter(array &$suggestions, array $variables) {
+
+  // Region suggestion for blocks in Drupal.
+  if (isset($variables['elements']['#id'])) {
+    if ($block = Block::load($variables["elements"]["#id"])) {
+      $region = $block->getRegion();
+      $suggestions[] = 'block__' . $region;
+    }
+  }
+}

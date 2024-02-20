@@ -1,0 +1,121 @@
+#ddev-generated
+
+http:
+  routers:
+    
+    
+    sop-engine-poc-web-80-http:
+      
+      rule: HostRegexp(`sop-engine-poc.ddev.site`)
+      
+      service: "sop-engine-poc-web-80-http"
+      tls: false
+      entrypoints:
+        - http-80
+    
+    
+    sop-engine-poc-web-8025-http:
+      
+      rule: HostRegexp(`sop-engine-poc.ddev.site`)
+      
+      service: "sop-engine-poc-web-8025-http"
+      tls: false
+      entrypoints:
+        - http-8025
+    
+    
+    
+    
+    sop-engine-poc-adminer-8080-http:
+      
+      rule: HostRegexp(`sop-engine-poc.ddev.site`)
+      
+      service: "sop-engine-poc-adminer-8080-http"
+      tls: false
+      entrypoints:
+        - http-9100
+    
+    
+    
+    
+    
+    sop-engine-poc-web-80-https:
+      
+      rule: HostRegexp(`sop-engine-poc.ddev.site`)
+      
+      service: "sop-engine-poc-web-80-https"
+      
+      tls: true
+      
+      entrypoints:
+        - http-443
+    
+    
+    sop-engine-poc-web-8025-https:
+      
+      rule: HostRegexp(`sop-engine-poc.ddev.site`)
+      
+      service: "sop-engine-poc-web-8025-https"
+      
+      tls: true
+      
+      entrypoints:
+        - http-8026
+    
+    
+    
+    sop-engine-poc-adminer-8080-https:
+      
+      rule: HostRegexp(`sop-engine-poc.ddev.site`)
+      
+      service: "sop-engine-poc-adminer-8080-https"
+      
+      tls: true
+      
+      entrypoints:
+        - http-9101
+    
+    
+
+  services:
+    
+    sop-engine-poc-web-80-http:
+      loadbalancer:
+        servers:
+          - url: http://ddev-sop-engine-poc-web:80
+    
+    sop-engine-poc-web-8025-http:
+      loadbalancer:
+        servers:
+          - url: http://ddev-sop-engine-poc-web:8025
+    
+    sop-engine-poc-web-80-https:
+    
+      loadbalancer:
+        servers:
+          - url: http://ddev-sop-engine-poc-web:80
+    
+    sop-engine-poc-web-8025-https:
+    
+      loadbalancer:
+        servers:
+          - url: http://ddev-sop-engine-poc-web:8025
+    
+    sop-engine-poc-adminer-8080-http:
+      loadbalancer:
+        servers:
+          - url: http://ddev-sop-engine-poc-adminer:8080
+    
+    sop-engine-poc-adminer-8080-https:
+    
+      loadbalancer:
+        servers:
+          - url: http://ddev-sop-engine-poc-adminer:8080
+    
+
+
+tls:
+  certificates:
+    - certFile: /mnt/ddev-global-cache/traefik/certs/sop-engine-poc.crt
+      keyFile: /mnt/ddev-global-cache/traefik/certs/sop-engine-poc.key
+

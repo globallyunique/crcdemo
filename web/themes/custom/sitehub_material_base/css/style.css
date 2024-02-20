@@ -1,0 +1,616 @@
+/* HIDES THE ADMIN TOOLBAR AND EDIT BUTTONS */
+
+/* .contextual {
+  display: none;
+}
+
+#toolbar-bar {
+  display: none;
+  height: 0px;
+  width: 0px;
+}
+
+.toolbar-tray-open.toolbar-vertical.toolbar-fixed {
+  margin-inline-start: 0px;
+}  */
+
+/* Hidding other pesky items temporary */
+
+.region-messages {
+  display: none;
+} 
+
+.tabs__items {
+  display: none;
+}
+
+.form-item.js-form-type-vertical-tabs {
+  display: none;
+}
+
+.node--promoted h2 {
+  font-size: 1.5rem;
+}
+
+.contacts-row h3 {
+  font-size: 1.5rem;
+}
+
+/* Web Browser Default */
+table {
+  display: table;
+  border-collapse: collapse;
+  box-sizing: border-box;
+  text-indent: initial;
+  border-spacing: 0px;
+  border-color: gray;
+}
+
+button, input, optgroup, select, textarea {
+  font-family: inherit;
+  font-size: 100%;
+  line-height: 1.7;
+  margin: 0;
+}
+
+input, optgroup, select {
+  height:32px;
+}
+
+/* Drupal Content */
+* {
+  box-sizing: border-box;
+}
+
+.cke *,
+.toolbar * {
+  box-sizing: content-box;
+}
+
+.layout-container {
+  margin: 0;
+}
+
+.layout-container--page {
+  .main-content__container {
+    @extend .container;
+  }
+  flex-grow: 1;
+  display: flex;
+  flex-direction: row;
+}
+
+.container,
+.container-fluid {
+  padding-left: 16px; 
+  padding-right: 16px;
+  width: 100%;
+}
+
+.container {
+  max-width: 1200px;
+  margin-left: 8px;
+  margin-right: auto;
+}
+
+img,
+embed,
+object,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+html,
+body {
+  min-height: 100vh;
+}
+
+body,
+.dialog-off-canvas-main-canvas,
+.page-container,
+.page-navbar-adjust,
+.page-main {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+a {
+  color: #494bb8;
+}
+
+.page {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: row;
+}
+
+.page-content {
+  flex-grow: 1;
+  display: flex;
+}
+
+.page-title {
+  color: #4C5C96;
+  font-size: 1.15rem;
+  line-height: 2rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  margin-bottom: 0px;
+}
+
+.page-sidebar--first {
+  display: flex;
+  order: 1; /* This will place the sidebar first in the row */
+  flex-basis: 25%; 
+  min-width: 232px;
+  overflow: auto;
+
+  .views-label {
+    font-weight:lighter;
+    font-size: .6rem;
+  }
+}
+
+.region-content {
+  display: flex;
+  order: 2; /* This will place the content second in the row */
+  overflow: auto;
+  flex-direction: column;
+  flex-basis: 100%; 
+}
+
+/* added to hide the Apply button on view search forms */
+ .views-exposed-form {
+  display: flex;
+  align-items: center;
+  }
+
+.main-content__container {
+  padding-left: 8px !important;
+  padding-right: 8px;
+  width: 100%;
+}
+
+.button-submit__input {
+  text-align: center;
+  display: block;
+  padding: 4px 16px 4px 16px;
+  background-color: #4C5C96;
+  color: #ffffff;
+  border: 0px;
+  text-decoration: none;
+  border-radius: 5px;
+  max-width: 135px;
+  margin: 0px 4px 8px 4px;
+  height: 32px;
+}
+
+/* apply button for search */
+#edit-submit-patients,
+#edit-submit-studies,
+#edit-submit-events {
+  background-color: #C0C0C0 !important;
+  color: #101010;
+}
+
+
+/* Add space between table cells */
+.custom-view td,
+.taskconsole-tasks td,
+.custom-view th,
+.taskconsole-tasks th {
+  padding: 8px;
+}
+
+.custom-view th,
+.taskconsole-tasks th {
+  background-color: #c0c0c0;
+  border: 1px solid #bbb;
+  text-align: left;
+}
+
+/* Add border to table cells */
+.custom-view td,
+.taskconsole-tasks td {
+  border: 1px solid #aaa;
+}
+
+/* Color even rows */
+.custom-view tr:nth-child(even),
+.taskconsole-tasks tr:nth-child(even) {
+  background-color: #f0f0f0; /* Light grey color */
+}
+
+/* Color odd rows */
+.custom-viewble tr:nth-child(odd),
+.taskconsole-tasks tr:nth-child(odd){
+  background-color: #ffffff; /* White color */
+}
+
+.custom-view table,
+.taskconsole-tasks table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+/** FORM **********************************************/
+/* #region */
+.form-item {
+    margin-top: 8px;
+    margin-bottom: 16px;
+    max-width: 670px;
+}
+
+.form-item label:not(.mdc-text-field):not(.option) {
+  display: block;
+  margin-bottom: 0px;
+}
+
+.form-item label {
+  order: 1;
+  font-weight:bolder;
+  text-transform: uppercase;
+  font-size: .5rem !important;
+  line-height: 16px;  
+}
+
+/* #endregion */
+
+/** NAVBAR **********************************************/
+/* #region */
+.navbar {
+  background: #292b39;
+  color: #fff;
+  z-index: 5;
+}
+
+.navbar__section {
+  display: inline-flex;
+  flex: 1 1 auto;
+  align-items: center;
+  padding: 8px 12px 0px 12px;
+  z-index: 1;
+}
+
+.navbar-branding__logo {
+  display: block;
+  padding: 0px 8px 0px 8px;
+  height: 48px;
+  width: 64px;
+  margin-right: 0px;
+  }
+ 
+.navbar-branding__title {
+  padding-right: 48px;
+  padding-left: 0px;
+  line-height: 1;
+  font-weight: 400;
+  font-family:"Roboto", "Helvetica", "Arial", sans-serif;
+}
+
+.navbar-branding__title a {
+  font-size: 1.5rem; 
+  font-family: system-ui;
+  color:#92A7CE;
+  font-weight: 700;
+}
+
+.navbar-branding__slogan {
+  margin-left: 12px;
+  margin-right: 12px;
+  font-size: .675rem;
+}
+/* #endregion */
+
+/** CARDS **********************************************/
+/* #region */
+
+.block__heading h2 {
+  font-size: 1.15rem;
+  line-height: 2rem;
+  font-weight: 500;
+  font-family: "Roboto",sans-serif;
+  text-transform: uppercase;
+  color: #4C5C96;
+  padding-bottom:0px;
+}
+
+.block__content {
+  padding-right: 24px;
+}
+
+.card {
+  padding-bottom: 16px;
+  padding-left: 16px;
+}
+
+.card .views-field {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 8px;
+}
+
+.card .views-field .views-label {
+  order: 1;
+  font-weight:bolder;
+  text-transform: uppercase;
+  font-size: .5rem;
+  line-height: 16px;
+}
+
+.card .views-field .field-content {
+  order: 2;
+  line-height: normal;
+}
+/* #endregion */
+
+/** WEBFORM **********************************************/
+/* #region */
+/** WEBFORM */
+/** Task Layout */
+
+/* Collapse block */
+.webform-details-toggle-state-wrapper {
+  text-align: right;
+  margin-top: 0em;
+}
+
+.js-form-item-filter-table {
+  /* height: 40px; */
+  margin-Left: 8px;
+  font-size: 1.2em;
+}
+
+#edit-filter-table {
+  height: 32px;
+}
+
+/* FIX FOR DOB LABEL */
+.field--type-datetime h4 {
+  font-size: 0.5rem;
+  line-height: 0.9rem;
+  font-weight: 500;
+  font-family: "Roboto",sans-serif;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  padding: 0px 0px;
+}
+
+.button input {
+  padding: 2px 16px;
+  color: #ffffff;
+  background-color: #4C5C96;
+}
+
+.contacts-row-image {
+  width: 48px;
+}
+
+.ckeditor-accordion-container a {
+  background-color: #4C5C96;
+}
+
+#edit-body-0-format {
+  display: none;
+}
+
+/** WEBFORM */
+/** FORM - Task Layout */
+/** Based on added classes */
+.step-header {
+  display: flex;
+  align-items: center;
+}
+
+.step-header label {
+  font-size: 1.1em !important;
+  font-weight:normal !important;
+  color: #4C5C96;
+  padding-left: 4px;
+}
+
+.step-header input {
+  width: 20px;
+  height: 20px;
+}
+
+.step-content {
+  margin: 0px 0px 32px 32px;
+  padding: none;
+}
+
+.step-detail-header {
+  font-size: 0.7em;
+  font-weight: bold;
+}
+
+.step-detail-header {
+  font-size: 0.9em;
+  font-weight: bold;
+  padding: 16px 0px 0px 0px;
+}
+
+.step-detail-definition ul {
+  padding: 0px 0px 0px 8px;
+  margin: 0px 0px 0px 8px;
+}
+
+.step-detail-definition ul li {
+  margin-bottom: 0px;
+}
+
+.step-detail-list div {
+  font-size: 0.9em;
+  font-weight: bold;
+}
+
+.step-detail-list ul {
+  list-style-type: none;
+  padding: 0px;
+  margin: 4px 0px 4px 0px;
+}
+
+.step-detail-list ul li {
+  margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: start;
+}
+
+.step-detail-item {
+  margin-left: 8px;
+}
+
+.step-detail-item span {
+  margin-right: 24px;
+  color: #555555;
+  display: flex;
+  align-items: center;  
+}
+
+.step-detail-item span img {
+  margin-right: 4px;
+}
+
+.step-detail-item span a {
+  text-decoration: none;
+  color: #0000EE;
+  padding-right: 4px;
+}
+
+.step-detail-list ul li a:hover {
+  text-decoration: underline;
+}
+
+.task-primary-button label input {
+  background-color: #4C5C96;
+}
+
+.task-secondary-button label input {
+  background-color: #808080;
+}
+
+.step-detail-header {
+  font-size: 0.9em;
+  font-weight: bold;
+}
+
+.step-item {
+  margin-left: 16px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: start;
+}
+
+.step-item span {
+  margin-right: 16px;
+  display: flex;
+  align-items: center;  
+}
+
+.step-item a {
+  padding-right: 4px;
+}
+
+.step-item img, 
+.step-comm img {
+    margin-right: 2px;
+    width: 16px;
+    height: 16px;
+  }
+
+.step-name {
+  color: #000000;
+  width: 300px
+}
+
+.step-role {
+  padding-left: 4px;
+  color: #808080;
+}
+
+.step-comm {
+  color: #555555;
+}
+
+.step-robot {
+  color: #10b973;
+  padding-left: 24px;
+  padding-right: 2px;
+  text-decoration: underline;
+}
+
+.step-item span a {
+  text-decoration: underline;
+  color: #3131c4;
+}
+
+.step-item a {
+  text-decoration: underline;
+  color: #3131c4;
+}
+
+/* #endregion */
+
+/** EVENTS **********************************************/
+/* #region */
+.breadcrumb {
+  margin-top: 0;
+  margin-bottom: 16px; 
+}
+
+.breadcrumb__item-label {
+  text-decoration: none;
+  font-size: .8rem;
+  line-height: 16px;
+  font-weight: 600;
+  color:#4C5C96;
+}
+/* #endregion */
+
+/** BREADCRUMBS **********************************************/
+/* #region */
+.views-field-field-event-date {
+  width: auto;
+}
+
+/* #endregion */
+
+/** TASKCONSOLE **********************************************/
+/* #region */
+.taskconsole-tasks td:last-child {
+  width: auto;
+}
+/* #endregion */
+
+/** FOOTER **********************************************/
+/* #region */
+.footer {
+  background: #292b39c2;
+  font-size: .8rem;
+  line-height: 1.15rem;
+  font-weight: 500;
+  color: white;
+}
+/* #endregion */
+
+/** CONTACT **********************************************/
+/* #region */
+.contact-summary div img {
+  display: none;
+}
+
+.contact-summary h2 {
+  display: none;
+}
+
+.block-contacts div h2 {
+  font-size: 0.8rem;
+}
+/* #endregion */

@@ -1,0 +1,7 @@
+name: 'Open System And Autocomplete'
+type: module
+description: 'opens a system via a URL and runs the RPA to autocomplete'
+package: Custom
+core_version_requirement: ^10
+dependencies:
+  - views

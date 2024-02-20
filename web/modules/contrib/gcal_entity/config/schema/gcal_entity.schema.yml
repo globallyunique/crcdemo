@@ -1,0 +1,26 @@
+gcal_entity.settings:
+  type: mapping
+  label: Settings
+  mapping:
+    googleapi:
+      type: string
+    start:
+      type: string
+    end:
+      type: string
+    datelimit:
+      type: integer
+    maxevents:
+      type: integer
+    dateformat:
+      type: string
+    timeformat:
+      type: string
+    noeventstext:
+      type: string
+    linktext:
+      type: string
+    hangoutlinktext:
+      type: string
+    cachetime:
+      type: integer

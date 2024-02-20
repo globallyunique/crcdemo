@@ -1,0 +1,12 @@
+googleapi: ''
+start: 'today'
+end: '+12 months'
+datelimit: 10
+maxevents: 5
+dateformat: 'l, F jS'
+timeformat: 'h:ia'
+noeventstext: '<p>No upcoming events</p>'
+linktext: 'View this event in Google Calendar'
+hangoutlinktext: 'Join Google Calendar Event Hangout'
+cachetime: 3600
+timezone: 'America/Chicago'

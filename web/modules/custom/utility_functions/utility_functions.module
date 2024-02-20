@@ -1,0 +1,35 @@
+<?php
+
+/**
+ * Removes specified permissions from all roles.
+ */
+function utility_functions_update_8001() {
+  $permissions_to_remove = [
+    'start template a1c_visit',
+    'start template form_approval_flow',
+    'start template new_patient',
+    'start template simple_parallel_to_serial',
+    'start template template simple_screening',
+    // Add all the permissions you want to remove
+  ];
+
+  $all_permissions = \Drupal::service('user.permissions')->getPermissions();
+
+  foreach ($permissions_to_remove as $permission) {
+    if (!isset($all_permissions[$permission])) {
+      continue;
+    }
+
+    $roles = user_roles(FALSE, $permission);
+
+    foreach ($roles as $role) {
+      // Check if the role has the permission
+      if ($role->hasPermission($permission)) {
+        $role->revokePermission($permission)->save();
+      }
+    }
+  }
+
+  drupal_flush_all_caches();
+}
+

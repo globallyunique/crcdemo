@@ -1,0 +1,7 @@
+name: Checklist View
+type: module
+description: 'Support for the Checklist View behaviors.'
+core_version_requirement: ^10
+package: Custom
+dependencies:
+  - views

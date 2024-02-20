@@ -1,0 +1,86 @@
+diff --git a/core/modules/shortcut/src/Controller/ShortcutSetController.php b/core/modules/shortcut/src/Controller/ShortcutSetController.php
+index a0ac48bdf9..4530af4f10 100644
+--- a/core/modules/shortcut/src/Controller/ShortcutSetController.php
++++ b/core/modules/shortcut/src/Controller/ShortcutSetController.php
+@@ -54,6 +54,11 @@ public static function create(ContainerInterface $container) {
+   public function addShortcutLinkInline(ShortcutSetInterface $shortcut_set, Request $request) {
+     $link = $request->query->get('link');
+     $name = $request->query->get('name');
++
++    if (!$name) {
++      $name = '(empty)';
++    }
++
+     if (parse_url($link, PHP_URL_SCHEME) === NULL && $this->pathValidator->isValid($link)) {
+       $shortcut = $this->entityTypeManager()->getStorage('shortcut')->create([
+         'title' => $name,
+diff --git a/core/modules/shortcut/tests/modules/shortcut_test/shortcut_test.info.yml b/core/modules/shortcut/tests/modules/shortcut_test/shortcut_test.info.yml
+new file mode 100644
+index 0000000000..885bfdae70
+--- /dev/null
++++ b/core/modules/shortcut/tests/modules/shortcut_test/shortcut_test.info.yml
+@@ -0,0 +1,7 @@
++name: 'Shortcut test'
++type: module
++description: 'Support module for shortcut tests.'
++package: Testing
++version: VERSION
++dependencies:
++  - drupal:shortcut
+diff --git a/core/modules/shortcut/tests/modules/shortcut_test/shortcut_test.routing.yml b/core/modules/shortcut/tests/modules/shortcut_test/shortcut_test.routing.yml
+new file mode 100644
+index 0000000000..32ee33b663
+--- /dev/null
++++ b/core/modules/shortcut/tests/modules/shortcut_test/shortcut_test.routing.yml
+@@ -0,0 +1,6 @@
++shortcut_test.no_title_page:
++  path: '/shortcut_test/no_title'
++  defaults:
++    _controller: '\Drupal\shortcut_test\Controller\ShortcutTestController::PageNoTitle'
++  requirements:
++    _access: 'TRUE'
+diff --git a/core/modules/shortcut/tests/modules/shortcut_test/src/Controller/ShortcutTestController.php b/core/modules/shortcut/tests/modules/shortcut_test/src/Controller/ShortcutTestController.php
+new file mode 100644
+index 0000000000..fc84a2583e
+--- /dev/null
++++ b/core/modules/shortcut/tests/modules/shortcut_test/src/Controller/ShortcutTestController.php
+@@ -0,0 +1,16 @@
++<?php
++
++namespace Drupal\shortcut_test\Controller;
++
++use Drupal\Core\Controller\ControllerBase;
++
++/**
++ * Controller for shortcut_test module.
++ */
++class ShortcutTestController extends ControllerBase {
++
++  public function PageNoTitle() {
++    return ['#markup' => 'Shortcut test no page title.'];
++  }
++
++}
+diff --git a/core/modules/shortcut/tests/src/Functional/ShortcutLinksTest.php b/core/modules/shortcut/tests/src/Functional/ShortcutLinksTest.php
+index cd0d8edc1d..5b9576a116 100644
+--- a/core/modules/shortcut/tests/src/Functional/ShortcutLinksTest.php
++++ b/core/modules/shortcut/tests/src/Functional/ShortcutLinksTest.php
+@@ -26,7 +26,7 @@ class ShortcutLinksTest extends ShortcutTestBase {
+    *
+    * @var array
+    */
+-  protected static $modules = ['router_test', 'views', 'block'];
++  protected static $modules = ['router_test', 'views', 'block', 'shortcut_test'];
+ 
+   /**
+    * {@inheritdoc}
+@@ -224,6 +224,9 @@ public function testShortcutQuickLink() {
+     // Add shortcut to this page.
+     $this->clickLink('Add to Default shortcuts');
+     $this->assertSession()->pageTextContains("Added a shortcut for {$page_title}.");
++
++    $this->drupalGet('shortcut_test/no_title');
++    $this->clickLink('Add to Default shortcuts');
+   }
+ 
+   /**

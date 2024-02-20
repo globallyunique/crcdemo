@@ -1,0 +1,6 @@
+condition.plugin.theme_rule_test:
+  type: condition.plugin
+  mapping:
+    rule:
+      type: string
+      label: Rule

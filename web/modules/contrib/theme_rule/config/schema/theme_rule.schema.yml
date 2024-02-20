@@ -1,0 +1,22 @@
+theme_rule.rule.*:
+  type: config_entity
+  label: Theme rule
+  mapping:
+    id:
+      type: string
+      label: ID
+    label:
+      type: label
+      label: Label
+    theme:
+      type: string
+      label: Theme
+    weight:
+      type: integer
+      label: Weight
+    conditions:
+      type: sequence
+      label: Conditions
+      sequence:
+        type: condition.plugin.[id]
+        label: Condition

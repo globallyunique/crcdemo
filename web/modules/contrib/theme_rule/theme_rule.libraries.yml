@@ -1,0 +1,7 @@
+conditions:
+  version: VERSION
+  js:
+    js/theme_rule.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal

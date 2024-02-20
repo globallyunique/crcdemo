@@ -1,0 +1,4 @@
+services:
+  gcal_entity.google_processor:
+    class: Drupal\gcal_entity\GoogleProcessor
+    arguments: ['@messenger', '@config.factory','@date.formatter']

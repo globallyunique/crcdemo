@@ -1,0 +1,10 @@
+.page-title {
+  @extend .page-title-standard;
+  margin-bottom: $spacing * 1;
+}
+
+.layout-container--page {
+  .main-content__container {
+    @extend .spacing-my-standard;
+  }
+}

@@ -1,0 +1,6 @@
+services:
+  open_system_and_autocomplete.theme_negotiator:
+    class: Drupal\open_system_and_autocomplete\Theme\OpenSystemAndAutocompleteThemeNegotiator
+    arguments: ['@logger.factory']
+    tags:
+      - { name: theme_negotiator, priority: 10000 }

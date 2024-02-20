@@ -1,0 +1,5 @@
+open_in_new_tab:
+  js:
+    js/open_in_new_tab.js: {}
+  dependencies:
+    - core/drupal

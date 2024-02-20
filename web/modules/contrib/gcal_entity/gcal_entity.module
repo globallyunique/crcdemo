@@ -1,0 +1,60 @@
+<?php
+
+/**
+ * @file
+ * Contains gcal_entity.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\gcal_entity\Entity\GcalEntity;
+
+/**
+ * Implements hook_help().
+ */
+function gcal_entity_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the gcal_entity module.
+    case 'help.page.gcal_entity':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Integrate GCal as an Entity') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function gcal_entity_theme(): array {
+  return [
+    'gcal_entity' => [
+      'render element' => 'children',
+    ],
+    'gcal_event' => [
+      'variables' => [ 'event' => [] ],
+      'template' => 'gcal-event',
+    ],
+  ];
+}
+
+
+/**
+ * @param $variables
+ */
+function gcal_entity_preprocess_gcal_entity(&$variables): void {
+  $variables['#attached']['library'] = 'gcal_entity/gcal_entity';
+  $entity = $variables['children']['#gcal_entity'];
+  $variables['calendar_id'] = $entity->getCalendarId();
+  $variables['name'] = $entity->getName();
+  $events_renderable = GcalEntity::getCalendars($entity->getCalendarId());
+  $variables['events'] = $events_renderable;
+}
+
+function gcal_entity_theme_suggestions_gcal_entity($vars): array {
+  $suggestions = [];
+  $suggestions[] = 'gcal_entity__' .  $vars['children']['#view_mode'];
+  return $suggestions;
+}
+

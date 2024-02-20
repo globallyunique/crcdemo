@@ -1,0 +1,45 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_form_mode.profile.add_contact
+    - field.field.profile.crm_org.crm_org_address
+    - field.field.profile.crm_org.crm_org_name
+    - field.field.profile.crm_org.crm_phone
+    - field.field.profile.crm_org.org_image
+    - profile.type.crm_org
+  module:
+    - address
+id: profile.crm_org.add_contact
+targetEntityType: profile
+bundle: crm_org
+mode: add_contact
+content:
+  contacts_mail:
+    weight: 1
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  crm_org_address:
+    type: address_default
+    weight: 3
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  crm_org_name:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  crm_phone:
+    type: string_textfield
+    weight: 2
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+hidden: {  }

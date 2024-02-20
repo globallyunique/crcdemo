@@ -1,0 +1,15 @@
+
+# GCal Entity menu items definition
+entity.gcal_entity.collection:
+  title: 'GCal Entity list'
+  route_name: entity.gcal_entity.collection
+  description: 'List GCal Entity entities'
+  parent: system.admin_structure
+  weight: 100
+
+gcal_entity.config:
+  title: 'GCal Entity Global settings'
+  description: 'Set up globald calendar settings'
+  parent: system.admin_config_content
+  route_name: gcal_entity.config
+  weight: 100

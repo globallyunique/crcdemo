@@ -1,0 +1,44 @@
+name: Firma
+type: theme
+description: 'UIkit based Drupal theme'
+package: core
+base theme: false
+core_version_requirement: ^8 || ^9 || ^10
+
+# libraries
+libraries:
+  - firma/uikit
+  - firma/global-style
+  - firma/fonts
+
+# Regions
+regions:
+
+  navbar_left: 'Navbar Left'
+  navbar_right: 'Navbar Right'
+
+  content_top_up: 'Content Top Up'
+  content_top_down: 'Content Top Down'
+
+  highlighted: 'Highlighted' 
+  page_title: 'Page title'
+  breadcrumb: 'Breadcrumb'
+
+  content: 'Content'
+
+  sidebar_first: 'Left sidebar'
+  sidebar_second: 'Right sidebar'
+  content_bottom: 'Content Bottom'
+  footer: 'Footer'
+
+  auto_hidden_block: 'Auto hidden blocks'
+
+# Information added by Drupal.org packaging script on 2022-06-30
+# version: '1.1.15'
+# project: 'firma'
+# datestamp: 1656581219
+
+# Information added by Drupal.org packaging script on 2023-07-04
+version: '1.1.23'
+project: 'firma'
+datestamp: 1688457218

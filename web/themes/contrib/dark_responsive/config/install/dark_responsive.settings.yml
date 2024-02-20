@@ -1,0 +1,26 @@
+features:
+  node_user_picture: 1
+  comment_user_picture: 1
+  comment_user_verification: 1
+  favicon: 1
+logo:
+  use_default: 1
+favicon:
+  use_default: 1
+show_hide_video: 1
+slide1_video: {  }
+slide1_title: 'flower of humanity'
+slide1_description: 'Love is the flower you’ve got to let grow'
+slide2_video: {  }
+slide2_title: 'flower of humanity'
+slide2_description: 'Love is the flower you’ve got to let grow'
+slide3_video: {  }
+slide3_title: 'flower of humanity'
+slide3_description: 'Love is the flower you’ve got to let grow'
+show_social_icons: 1
+facebook_url: 'https://www.facebook.com'
+instagram_url: 'https://www.instagram.com'
+twitter_url: 'https://twitter.com/'
+youtube_url: 'https://www.youtube.com/'
+show_hide_copyright: 1
+copyright_text: '&copy; Copyright 2023 · All rights reserved'

@@ -1,0 +1,10 @@
+name: Maestro Template Builder
+description: Maestro Template Builder SVG.
+core_version_requirement: ^9.4 || ^10
+configure: maestro_template_builder.maestro_template_builder_admin_settings
+package: Maestro
+type: module
+scripts:
+  - js/template-display.js
+dependencies:
+  - maestro:maestro

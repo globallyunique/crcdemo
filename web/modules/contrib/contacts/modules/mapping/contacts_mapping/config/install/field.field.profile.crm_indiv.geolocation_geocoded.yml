@@ -1,0 +1,42 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.profile.geolocation_geocoded
+    - profile.type.crm_indiv
+  module:
+    - contacts_mapping
+    - geocoder_field
+    - geofield
+    - profile
+  enforced:
+    module:
+      - contacts_mapping
+third_party_settings:
+  geocoder_field:
+    method: geocode
+    weight: 0
+    field: crm_address
+    skip_not_empty_value: false
+    disabled: false
+    hidden: false
+    providers:
+      - googlemaps
+    dumper: wkt
+    delta_handling: default
+    failure:
+      handling: preserve
+      status_message: true
+      log: true
+id: profile.crm_indiv.geolocation_geocoded
+field_name: geolocation_geocoded
+entity_type: profile
+bundle: crm_indiv
+label: Geo-location
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: geofield

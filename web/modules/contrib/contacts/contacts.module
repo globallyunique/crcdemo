@@ -1,0 +1,1412 @@
+<?php
+
+/**
+ * @file
+ * Module related hook implementations for the contacts module.
+ */
+
+use Drupal\commerce_order\Form\OrderForm;
+use Drupal\Component\Plugin\PluginBase;
+use Drupal\Component\Utility\Html;
+use Drupal\contacts\Dashboard;
+use Drupal\contacts\Form\AddContactForm;
+use Drupal\contacts\Form\ContactsProfileForm;
+use Drupal\contacts\Form\RegisterForm;
+use Drupal\contacts\Plugin\Block\ContactsEntity;
+use Drupal\contacts\Plugin\DashboardBlockInterface;
+use Drupal\contacts\Plugin\facets\url_processor\StatefulQuerystringUrlProcessor;
+use Drupal\contacts\Plugin\Field\EntityLabelItemList;
+use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Cache\Cache;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Link;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Site\Settings;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Template\Attribute;
+use Drupal\Core\Url;
+use Drupal\decoupled_auth\DecoupledAuthUserInterface;
+use Drupal\search_api\SearchApiException;
+use Drupal\user\Entity\User;
+use Drupal\user\RoleInterface;
+use Drupal\user\UserInterface;
+use Drupal\views\Plugin\views\cache\CachePluginBase;
+use Drupal\views\ResultRow;
+use Drupal\views\ViewExecutable;
+
+/**
+ * Implements hook_theme().
+ */
+function contacts_theme() {
+  return [
+    'contacts_dash_tabs' => [
+      'variables' => [
+        'tabs' => [],
+        'contact' => NULL,
+        'manage_mode' => NULL,
+        'attributes' => [],
+      ],
+      'template' => 'contacts-dash-tabs',
+    ],
+    'contacts_dash_summary' => [
+      'variables' => ['user' => NULL],
+      'template' => 'contacts-dash-summary',
+    ],
+    'user__contacts_dashboard_row' => [
+      'base hook' => 'user',
+      'template' => 'user--contacts-dashboard-row',
+    ],
+    'user__contacts_dashboard_row_small' => [
+      'base hook' => 'user',
+      'template' => 'user--contacts-dashboard-row-small',
+    ],
+    'contacts_manage_block' => [
+      'variables' => [
+        'id' => NULL,
+        'tab' => NULL,
+        'subpage' => NULL,
+        'block' => [],
+        'attributes' => [],
+        'label' => '',
+        'description' => '',
+      ],
+      'template' => 'contacts-manage-block',
+    ],
+    // Override the rendering of the dashboard tabs block to remove
+    // block markup applied by the theme.
+    'block__tabs__contacts_dashboard' => [
+      'template' => 'block--tabs--contacts-dashboard',
+      'base hook' => 'block',
+    ],
+  ];
+}
+
+/**
+ * Prepares variables for contacts manage blocks.
+ *
+ * Default template: contacts-manage-block.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - attributes: HTML markup attributes for the content wrapper.
+ *   - region_attributes: HTML markup attributes for the content wrapper.
+ */
+function template_preprocess_contacts_manage_block(array &$variables) {
+  $configuration = $variables['block']->getConfiguration();
+
+  [$variables['block_plugin'], $variables['identifier']] = explode(PluginBase::DERIVATIVE_SEPARATOR, $variables['id'], 2);
+
+  $variables['attributes']['data-contacts-manage-block-name'] = $configuration['name'];
+  $variables['attributes']['data-contacts-manage-block-tab'] = $variables['tab']->id();
+
+  $variables['label'] = $variables['label'] ?: $variables['block']->label(FALSE);
+  $variables['content']['description'] = [
+    '#type' => 'html_tag',
+    '#tag' => 'strong',
+    '#value' => $variables['description'],
+    '#prefix' => '<div>',
+    '#suffix' => '</div>',
+  ];
+
+  if ($variables['block'] instanceof DashboardBlockInterface) {
+    $variables['block']->processManageMode($variables);
+  }
+
+  // UI icons for manage mode.
+  $variables['ui'] = [
+    'drag' => [
+      '#type' => 'open_iconic',
+      '#size' => '20',
+      '#icon' => 'move',
+      '#fill' => '#000',
+      '#color' => 'transparent',
+      '#attributes' => ['class' => ['contacts-ui-icon', 'icon-left']],
+    ],
+    'configure' => [
+      '#type' => 'open_iconic',
+      '#size' => '20',
+      '#icon' => 'cog',
+      '#fill' => '#5bc0de',
+      '#color' => 'transparent',
+      '#attributes' => ['class' => ['contacts-ui-icon', 'icon-right']],
+    ],
+  ];
+
+  $variables['attributes'] = new Attribute($variables['attributes']);
+}
+
+/**
+ * Prepares variables for contact dashboard tab headers.
+ *
+ * Default template: contacts-dash-tabs.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing the unordered list element
+ *   representing the tab headings. This contains:
+ *   - attributes: HTML markup attributes for the content wrapper.
+ *   - tabs: Associative array of tabs and tab properties.
+ */
+function template_preprocess_contacts_dash_tabs(array &$variables) {
+  foreach ($variables['tabs'] as $tab_id => &$tab) {
+    if ($variables['manage_mode']) {
+      $tab['drag'] = [
+        '#type' => 'open_iconic',
+        '#size' => '15',
+        '#icon' => 'move',
+        '#color' => 'transparent',
+        '#fill' => '#000',
+        '#attributes' => [
+          'class' => ['mr-1', 'drag-handle'],
+        ],
+      ];
+
+      $tab['edit'] = [
+        '#type' => 'open_iconic',
+        '#size' => '15',
+        '#icon' => 'cog',
+        '#color' => 'transparent',
+        '#fill' => '#5bc0de',
+        '#attributes' => [
+          'class' => ['use-ajax', 'mr-2'],
+          'data-ajax-url' => Url::fromRoute('contacts.tab.off_canvas_form',
+            [
+              'tab' => $tab_id,
+            ]
+          )->toString(),
+          'data-dialog-type' => 'dialog',
+          'data-dialog-renderer' => 'off_canvas',
+        ],
+      ];
+    }
+    $tab['attributes'] = !empty($tab['attributes']) ? new Attribute($tab['attributes']) : new Attribute();
+    $tab['link_attributes'] = !empty($tab['link_attributes']) ? new Attribute($tab['link_attributes']) : new Attribute();
+  }
+}
+
+/**
+ * Prepares variables for contact tab content.
+ *
+ * Default template: contact-tab-content.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - attributes: HTML markup attributes for the content wrapper.
+ *   - region_attributes: HTML markup attributes for the content wrapper.
+ */
+function template_preprocess_contact_tab_content(array &$variables) {
+  $variables['region_attributes'] = new Attribute($variables['region_attributes']);
+}
+
+/**
+ * Prepares variables for contact dashboard summary block.
+ *
+ * Default template: contacts-dash-summary.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - attributes: HTML markup attributes for the content wrapper.
+ *   - user: Fully loaded drupal User object.
+ *   - crm_indiv: Boolean whether contact has an indiv profile.
+ *   - crm_org: Boolean whether contact has an org profile.
+ */
+function template_preprocess_contacts_dash_summary(array &$variables) {
+  /** @var \Drupal\decoupled_auth\Entity\DecoupledAuthUser $user */
+  $user = $variables['user'];
+
+  $image_display = [
+    'label' => 'hidden',
+    'type' => 'image',
+    'settings' => [
+      'image_style' => 'contacts_small',
+    ],
+  ];
+  $default_image_element = [
+    '#theme' => 'image_style',
+    '#style_name' => $image_display['settings']['image_style'],
+    '#width' => 100,
+    '#height' => 100,
+    '#attributes' => [],
+  ];
+
+  $variables['image'] = $user->hasField('user_picture') && !$user->get('user_picture')->isEmpty() ?
+    $user->get('user_picture')->get(0)->view($image_display) : '';
+
+  if ($user->getEmail()) {
+    $email = $user->getEmail();
+    $variables['email'] = Link::fromTextAndUrl($email, Url::fromUri('mailto:' . $email));
+  }
+
+  $variables['name'] = $user->getDisplayName();
+  $route_name = \Drupal::moduleHandler()->moduleExists('contacts_user_dashboard') ?
+    'contacts_user_dashboard.summary' :
+    'entity.user.canonical';
+  $variables['user_dashboard'] = Link::createFromRoute(new TranslatableMarkup('View user dashboard'), $route_name, ['user' => $user->id()], ['attributes' => ['target' => '_blank']]);
+
+  // For individuals.
+  if ($user->hasRole('crm_indiv')) {
+    if ($user->hasField('profile_crm_indiv') && $profile = $user->profile_crm_indiv->entity) {
+      /** @var \Drupal\profile\Entity\ProfileInterface $profile */
+      if ($profile->hasField('crm_phone') && !$profile->get('crm_phone')->isEmpty()) {
+        $variables['phone'] = $profile->get('crm_phone')->value;
+      }
+      if ($profile->hasField('crm_dob') && !$profile->get('crm_dob')->isEmpty()) {
+        $variables['dob'] = $profile->get('crm_dob')->first()->view([
+          'label' => 'hidden',
+          'settings' => [
+            'format_type' => 'html_date',
+          ],
+        ]);
+      }
+
+      // If user has a picture on their profile, use this instead
+      // of the user_picture field.
+      if ($profile->hasField('crm_photo') && $profile->crm_photo->target_id) {
+        $variables['image'] = $profile->crm_photo->view($image_display);
+      }
+    }
+    if (empty($variables['image'])) {
+      $variables['image'] = $default_image_element;
+      $variables['image']['#uri'] = 'contacts://images/default-indiv.png';
+    }
+  }
+  // For organisations.
+  elseif ($user->hasRole('crm_org')) {
+    if ($user->hasField('profile_crm_org') && $profile = $user->profile_crm_org->entity) {
+      if ($profile->hasField('crm_phone') && !$profile->get('crm_phone')->isEmpty()) {
+        $variables['phone'] = $profile->crm_phone->value;
+      }
+
+      // If user has an image on their profile, use this instead of the
+      // user_picture field.
+      if ($profile->hasField('org_image') && $profile->org_image->target_id) {
+        $variables['image'] = $profile->org_image->view($image_display);
+      }
+    }
+
+    if (empty($variables['image'])) {
+      $variables['image'] = $default_image_element;
+      $variables['image']['#uri'] = 'contacts://images/default-org.png';
+    }
+  }
+  // Assume this is a web account, so give some indiv like features.
+  else {
+    if (empty($variables['image'])) {
+      $variables['image'] = $default_image_element;
+      $variables['image']['#uri'] = 'contacts://images/default-indiv.png';
+    }
+  }
+
+  // Render user roles in summary block.
+  $roles = user_roles();
+  uasort($roles, 'contacts_sort_roles');
+  $roles = array_intersect(array_keys($roles), $user->getRoles());
+  $variables['hats'] = [];
+
+  foreach ($roles as $role) {
+    $variables['hats'][] = [
+      '#theme' => 'crm_tools_hat',
+      '#role' => $role,
+    ];
+  }
+
+}
+
+/**
+ * Implements hook_entity_type_build().
+ *
+ * Add contacts dashboard form operation to profile entity.
+ */
+function contacts_entity_type_build(array &$entity_types) {
+  /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
+  $entity_types['profile']->setFormClass('default', ContactsProfileForm::class);
+  $entity_types['profile']->setFormClass('contacts_dashboard', ContactsProfileForm::class);
+  $entity_types['profile']->setFormClass('add_contact', AddContactForm::class);
+
+  $entity_types['user']->setFormClass('register', RegisterForm::class);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert() for profile_type.
+ *
+ * Set up entity displays for contacts dashboard.
+ */
+function contacts_profile_type_insert($entity) {
+  $entity_type_manager = \Drupal::entityTypeManager();
+
+  // If we don't have the view mode, don't do anything.
+  if (!$entity_type_manager->getStorage('entity_view_mode')->load('contacts_dashboard')) {
+    return;
+  }
+
+  /** @var \Drupal\profile\Entity\ProfileTypeInterface $entity */
+  $view_storage = $entity_type_manager->getStorage('entity_view_display');
+  $form_storage = $entity_type_manager->getStorage('entity_form_display');
+
+  $values = [
+    'id' => implode('.', ['profile', $entity->id(), 'contacts_dashboard']),
+    'targetEntityType' => 'profile',
+    'bundle' => $entity->id(),
+    'mode' => 'contacts_dashboard',
+    'status' => TRUE,
+  ];
+
+  if (!$view_storage->load($values['id'])) {
+    $view_display = $view_storage->create($values);
+    $view_display->save();
+  }
+  if (!$form_storage->load($values['id'])) {
+    $form_display = $form_storage->create($values);
+    $form_display->save();
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_update() for profile.
+ */
+function contacts_profile_insert(EntityInterface $entity) {
+  \Drupal::service('contacts.indexer')->profilePostSave($entity);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert() for profile.
+ */
+function contacts_profile_update(EntityInterface $entity) {
+  /** @var \Drupal\profile\Entity\ProfileInterface $entity */
+  $tags = [];
+
+  // Invalidate user cache in case name has changed.
+  if (in_array($entity->bundle(), ['crm_indiv', 'crm_org'])) {
+    $tags[] = 'user:' . $entity->getOwnerId();
+  }
+
+  if (!empty($tags)) {
+    Cache::invalidateTags($tags);
+  }
+
+  \Drupal::service('contacts.indexer')->profilePostSave($entity);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_delete() for profile.
+ */
+function contacts_profile_delete(EntityInterface $entity) {
+  \Drupal::service('contacts.indexer')->profilePostSave($entity);
+}
+
+/**
+ * Implements hook_entity_field_access().
+ */
+function contacts_entity_field_access($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, FieldItemListInterface $items = NULL) {
+  if ($operation == 'view' && $field_definition->getName() == 'mail' && $field_definition->getTargetEntityTypeId() == 'user') {
+    return AccessResult::allowedIfHasPermission($account, 'view contacts');
+  }
+
+  return AccessResult::neutral();
+}
+
+/**
+ * Implements hook_user_access().
+ */
+function contacts_user_access(UserInterface $user, $operation, AccountInterface $account) {
+  // Allow users to view blocked user accounts if they can view contacts.
+  // The only other way to view blocked accounts is using `administer users`
+  // permission which is overkill for some cases.
+  if ($operation == 'view' && $user->isBlocked()) {
+    return AccessResult::allowedIfHasPermission($account, 'view contacts');
+  }
+
+  return AccessResult::neutral();
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert() for user.
+ */
+function contacts_user_insert(EntityInterface $entity) {
+  \Drupal::service('contacts.indexer')->indexImmediately($entity, TRUE);
+}
+
+/**
+ * Implements hook_toolbar().
+ *
+ * Add contacts manage icon css to toolbar.
+ */
+function contacts_toolbar() {
+  $items = [];
+  $items['contacts_manage'] = [
+    '#cache' => [
+      'contexts' => [
+        'user.permissions',
+        'route.name',
+      ],
+    ],
+  ];
+
+  if (!\Drupal::service('contacts.dashboard')->isDashboard()) {
+    return $items;
+  }
+
+  if (!\Drupal::currentUser()->hasPermission('manage contacts dashboard')) {
+    return $items;
+  }
+
+  $items['contacts_manage'] += [
+    '#type' => 'toolbar_item',
+    'tab' => [
+      '#type' => 'html_tag',
+      '#tag' => 'button',
+      '#value' => t('Manage Dashboard'),
+      '#attributes' => [
+        'class' => [
+          'toolbar-icon',
+          'toolbar-icon-edit',
+          'toolbar-dashboard-manage',
+        ],
+        'aria-pressed' => 'false',
+        'type' => 'button',
+      ],
+    ],
+    'tray' => [],
+    '#wrapper_attributes' => [
+      'class' => [
+        'contacts-toolbar-tab',
+      ],
+    ],
+    '#attached' => [
+      'library' => [
+        'contacts/dashboard.manage',
+        'crm_tools/open-iconic',
+        'contacts/drag_n_drop',
+      ],
+    ],
+  ];
+  $path = \Drupal::moduleHandler()->getModule('crm_tools')->getPath();
+  $items['contacts_manage']['#attached']['drupalSettings']['contacts']['openIconic']['path'] = '/' . $path . '/includes/open-iconic.svg';
+
+  return $items;
+}
+
+/**
+ * Implements hook_toolbar_alter().
+ *
+ * Add contacts icon css to toolbar.
+ */
+function contacts_toolbar_alter(&$items) {
+  // Move the User tab to the right.
+  $items['administration']['#attached']['library'][] = 'contacts/contacts.toolbar';
+}
+
+/**
+ * Implements hook_user_format_name_alter().
+ */
+function contacts_user_format_name_alter(&$name, AccountInterface $account) {
+  // Don't do anything with the anonymous user.
+  if ($account->isAnonymous()) {
+    return;
+  }
+
+  // Only proceed if we are an individual or organisation and may have a CRM
+  // based name.
+  $is_indiv = in_array('crm_indiv', $account->getRoles());
+  $is_org = in_array('crm_org', $account->getRoles());
+  if (!$is_indiv && !$is_org) {
+    return;
+  }
+
+  // Load up the full account as we need to get details from profiles.
+  // A recent save could result in the profile fields being out of date,
+  // so always reload.
+  $account = User::load($account->id());
+
+  if (!$account) {
+    // The user may have been deleted through the Cancel Account screen.
+    // Drupal will still invoke user_name_format_alter for deleted accounts.
+    return;
+  }
+
+  // If the user is coupled (i.e. registered), check the config before
+  // proceeding. If the config is not set, default to enabled..
+  if ($account->isCoupled() && !(\Drupal::config('contacts.configuration')->get('coupled_real_name') ?? TRUE)) {
+    return;
+  }
+
+  // Display the name for individuals.
+  if ($is_indiv && $account->hasField('profile_crm_indiv')) {
+    $profile_field = $account->get('profile_crm_indiv');
+    if ($profile_field->count()) {
+      /** @var \Drupal\profile\Entity\ProfileInterface $profile */
+      $profile = $profile_field->first()->entity;
+
+      if ($profile && $profile->hasField('crm_name') && !$profile->get('crm_name')->isEmpty()) {
+        $names = [];
+        /** @var \Drupal\name\Plugin\Field\FieldType\NameItem $name_field */
+        $name_field = $profile->get('crm_name')->first();
+        if ($name_field->given) {
+          $names[] = $name_field->given;
+        }
+
+        if ($name_field->family) {
+          $names[] = $name_field->family;
+        }
+
+        if (!empty($names)) {
+          $name = implode(' ', $names);
+        }
+
+        // We have set a name, so don't need to proceed further.
+        return;
+      }
+    }
+  }
+
+  // Display the name for organisations.
+  if ($is_org && $account->hasField('profile_crm_org')) {
+    $profile_field = $account->get('profile_crm_org');
+    if ($profile_field->count()) {
+      $profile = $profile_field->first()->entity;
+      if ($profile && $profile->hasField('crm_org_name')) {
+        $name_field = $profile->get('crm_org_name');
+        if (!$name_field->isEmpty()) {
+          $name = $name_field->value;
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function contacts_theme_suggestions_user(array $variables) {
+  $suggestions = [];
+  /** @var \Drupal\user\UserInterface $user */
+  $user = $variables['elements']['#user'];
+  $sanitized_view_mode = strtr($variables['elements']['#view_mode'], '.', '_');
+
+  $suggestions[] = 'user__' . $sanitized_view_mode;
+  foreach ($user->getRoles(TRUE) as $role) {
+    if (substr($role, 0, 4) == 'crm_') {
+      $suggestions[] = 'user__' . $role . '__';
+      $suggestions[] = 'user__' . $role . '__' . $sanitized_view_mode;
+    }
+  }
+
+  return $suggestions;
+}
+
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function contacts_preprocess_user(&$variables) {
+  $view_mode = $variables['elements']['#view_mode'];
+  $view_modes = [
+    'contacts_dashboard_row',
+    'contacts_dashboard_row_small',
+  ];
+  if (!in_array($view_mode, $view_modes)) {
+    return;
+  }
+
+  /** @var \Drupal\user\UserInterface $user */
+  $user = $variables['user'];
+  $image_display = [
+    'label' => 'hidden',
+    'type' => 'image',
+    'settings' => [
+      'image_style' => $view_mode == 'contacts_dashboard_row' ? 'contacts_small' : 'contacts_tiny',
+    ],
+  ];
+  $default_image_element = [
+    '#theme' => 'image_style',
+    '#style_name' => $image_display['settings']['image_style'],
+    '#width' => 100,
+    '#height' => 100,
+    '#attributes' => [],
+  ];
+
+  // Set some defaults.
+  // @todo Simplify this when we have 'primary fields'.
+  $variables['url'] = Url::fromRoute('contacts.contact', [
+    'user' => $user->id(),
+  ]);
+  $variables['label'] = $user->getDisplayName();
+  $variables['email'] = $user->getEmail();
+  if ($user instanceof DecoupledAuthUserInterface) {
+    $variables['web_account'] = $user->isCoupled();
+  }
+  $variables['image'] = $user->hasField('user_picture') && !$user->get('user_picture')->isEmpty() ?
+    $user->get('user_picture')->get(0)->view($image_display) : '';
+  $variables['address'] = '';
+
+  $roles = user_roles();
+  uasort($roles, 'contacts_sort_roles');
+  $roles = array_map(function ($item) {
+    return $item->label();
+  }, $roles);
+  $variables['roles'] = implode(', ', array_intersect_key($roles, array_fill_keys($user->getRoles(), TRUE)));
+
+  // For individuals.
+  if ($user->hasRole('crm_indiv')) {
+    if ($profile = $user->profile_crm_indiv->entity) {
+      $variables['profile'] = $profile;
+      if ($profile->hasField('crm_address')) {
+        $variables['address'] = $profile->crm_address->locality ?? NULL;
+      }
+
+      // If user has a picture on their profile, use this instead
+      // of the user_picture field.
+      if ($profile->hasField('crm_photo') && $profile->crm_photo->target_id) {
+        $variables['image'] = $profile->crm_photo->view($image_display);
+      }
+    }
+    if (empty($variables['image'])) {
+      $variables['image'] = $default_image_element;
+      $variables['image']['#uri'] = 'contacts://images/default-indiv.png';
+    }
+  }
+  // For organisations.
+  elseif ($user->hasRole('crm_org')) {
+    if ($profile = $user->profile_crm_org->entity) {
+      $variables['profile'] = $profile;
+      if ($profile->hasField('crm_org_address')) {
+        $variables['address'] = $profile->crm_org_address->locality ?? NULL;
+      }
+
+      // If user has an image on their profile, use this instead of the
+      // user_picture field.
+      if ($profile->hasField('org_image') && $profile->org_image->target_id) {
+        $variables['image'] = $profile->org_image->view($image_display);
+      }
+    }
+    if (empty($variables['image'])) {
+      $variables['image'] = $default_image_element;
+      $variables['image']['#uri'] = 'contacts://images/default-org.png';
+    }
+  }
+  // Assume this is a web account, so give some indiv like features.
+  else {
+    if (empty($variables['image'])) {
+      $variables['image'] = $default_image_element;
+      $variables['image']['#uri'] = 'contacts://images/default-indiv.png';
+    }
+  }
+}
+
+/**
+ * Sort roles by CRM then alphabetically.
+ *
+ * @param \Drupal\user\RoleInterface $a
+ *   The first role.
+ * @param \Drupal\user\RoleInterface $b
+ *   The first role.
+ *
+ * @return int
+ *   The comparison result for uasort().
+ */
+function contacts_sort_roles(RoleInterface $a, RoleInterface $b) {
+  $a_crm = substr($a->id(), 0, 4) == 'crm_';
+  $b_crm = substr($b->id(), 0, 4) == 'crm_';
+  if ($a_crm xor $b_crm) {
+    return $a_crm ? -1 : 1;
+  }
+  return strnatcmp($a->label(), $b->label());
+}
+
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function contacts_preprocess_views_view_unformatted(&$variables) {
+  if ($variables['view']->id() == 'contacts_dashboard_indexed') {
+    foreach ($variables['rows'] as $id => &$row) {
+      if (!empty($row['content']['#user'])) {
+        $url = Url::fromRoute('contacts.contact', [
+          'user' => $row['content']['#user']->id(),
+        ]);
+        $row['attributes']->setAttribute('data-row-link', $url->toString());
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_views_post_render().
+ */
+function contacts_views_post_render(ViewExecutable $view, &$output, CachePluginBase $cache) {
+  if ($view->id() == 'contacts_dashboard_indexed') {
+    $output['#attached']['library'][] = 'contacts/listings';
+  }
+}
+
+/**
+ * Implements hook_entity_type_alter().
+ *
+ * Update entity definitions of certain entity types to enable contacts Entity
+ * blocks and handle missing form operations.
+ *
+ * @see \Drupal\contacts\Plugin\Deriver\ContactsEntityBlockDeriver::getDerivativeDefinitions()
+ */
+function contacts_entity_type_alter(array &$entity_types) {
+  /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
+  // Approved entity types.
+  $dashboard_entity_types = [
+    'user',
+    'profile',
+  ];
+
+  /** @var \Drupal\Core\Entity\EntityDisplayRepository $entity_display_repository */
+  $entity_display_repository = \Drupal::service('entity_display.repository');
+  foreach ($dashboard_entity_types as $type) {
+    if (isset($entity_types[$type])) {
+      $entity_types[$type]->set('contacts_entity', TRUE);
+    }
+
+    // Add form operations for missing form modes.
+    $form_modes = $entity_display_repository->getFormModes($type);
+    foreach ($form_modes as $name => $form_mode) {
+      /** @var \Drupal\Core\Entity\Entity\EntityFormMode $form_mode */
+      if (!$entity_types[$type]->getFormClass($name)) {
+        // Use the default form for form modes that are not explicitly defined.
+        $default_handler_class = $entity_types[$type]->getHandlerClasses()['form']['default'];
+        $entity_types[$type]->setFormClass($name, $default_handler_class);
+      }
+    }
+  }
+
+  // Expand out separate entity blocks for profile bundles.
+  if (isset($entity_types['profile'])) {
+    $entity_types['profile']->set('contacts_use_bundles', TRUE);
+  }
+}
+
+/**
+ * Implements hook_link_alter().
+ *
+ * Convert all dashboard links into AJAX links.
+ */
+function contacts_link_alter(&$variables) {
+  Dashboard::fastHookLinkAlter($variables, 'contacts.dashboard');
+}
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter().
+ *
+ * Point the commerce back end forms to Contacts rather that People.
+ */
+function contacts_form_commerce_order_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $form_object = $form_state->getFormObject();
+  if (!($form_object instanceof OrderForm)) {
+    return;
+  }
+
+  /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
+  $order = $form_state->getFormObject()->getEntity();
+  $customer = $order->getCustomer();
+  if (!isset($form['uid']) && !$customer->isAnonymous()) {
+    $customer_link = Link::createFromRoute($customer->label(), 'contacts.contact', ['user' => $customer->id()])->toString();
+    $label = new TranslatableMarkup('Customer');
+    $form['customer']['uid'] = [
+      '#type' => 'item',
+      '#wrapper_attributes' => [
+        // phpcs:ignore Drupal.Arrays.Array.LongLineDeclaration
+        'class' => [Html::cleanCssIdentifier(strtolower($label)), 'container-inline'],
+      ],
+      '#markup' => '<h4 class="label inline">' . $label . '</h4> ' . $customer_link,
+    ];
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for user_cancel_form.
+ */
+function contacts_form_user_cancel_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  \Drupal::service('contacts.form_alter.user_cancel_confirm')->alter($form, $form_state, $form_id);
+}
+
+/**
+ * Implements hook_entity_base_field_info().
+ */
+function contacts_entity_base_field_info(EntityTypeInterface $entity_type) {
+  $fields = [];
+
+  if ($entity_type->id() == 'user') {
+    $fields['_label'] = BaseFieldDefinition::create('string')
+      ->setName('_label')
+      ->setTargetEntityTypeId('user')
+      ->setLabel(new TranslatableMarkup('Display Name'))
+      ->setRevisionable(FALSE)
+      ->setDisplayConfigurable('form', FALSE)
+      ->setDisplayConfigurable('view', FALSE)
+      ->setReadOnly(TRUE)
+      ->setComputed(TRUE)
+      ->setClass(EntityLabelItemList::class);
+  }
+
+  return $fields;
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_view_alter() for commerce_order.
+ */
+function contacts_commerce_order_view_alter(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display) {
+  // Make the UID link to the contacts dashboard.
+  if (isset($build['uid'][0]) && \Drupal::currentUser()->hasPermission('view contacts')) {
+    /** @var \Drupal\user\UserInterface $account */
+    $account = $build['uid'][0]['#account'];
+    $build['uid'][0] = Link::createFromRoute($account->getDisplayName(),
+      'contacts.contact',
+      ['user' => $account->id()])->toRenderable();
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * For form views_exposed_form_contacts_dashboard_indexed_full.
+ */
+function contacts_form_views_exposed_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  if ($form['#id'] == 'views-exposed-form-contacts-dashboard-indexed-simple' || $form['#id'] == 'views-exposed-form-contacts-dashboard-indexed-full') {
+    // Views exposed form will hide the reset button if there are no filters
+    // in the querystring. But we allow stateful filters by caching them in
+    // session. If we have cached filters, then re-enable the button.
+    $facet_source_id = 'search_api:views_block__contacts_dashboard_indexed__full';
+    $cache_key = StatefulQuerystringUrlProcessor::getCacheKey($facet_source_id);
+    if (\Drupal::request()->hasSession()) {
+      $session = \Drupal::request()->getSession();
+      if ($session && $session->get($cache_key)) {
+        $form['actions']['reset']['#access'] = TRUE;
+        $form['actions']['reset']['#submit'][] = '_contacts_reset_facet_filters';
+      }
+    }
+
+    // Views exposed form will incorrectly cache the value of the search input.
+    // Meaning that the list of results will be out of sync with what's rendered
+    // in the input field. Force the views exposed form to not be cached to
+    // work around this.
+    $form['#cache'] = ['max-age' => 0];
+  }
+  // Override the views exposed form submission URL for the Individuals and
+  // Organisations pages.
+  // Because the individuals/organisation view displays are embeds
+  // they don't have a URL.
+  // If we have views_data_export installed and an export is attached
+  // to these displays then views will incorrectly pick the export URL
+  // as the form submission action. Override the incorrectly generated urls.
+  elseif ($form['#id'] == 'views-exposed-form-contacts-dashboard-indexed-individuals') {
+    $form['#action'] = Url::fromRoute('contacts.collection.individual')->toString();
+  }
+  elseif ($form['#id'] == 'views-exposed-form-contacts-dashboard-indexed-organisations') {
+    $form['#action'] = Url::fromRoute('contacts.collection.organisation')->toString();
+  }
+}
+
+/**
+ * Resets facet filters.
+ *
+ * @param array $form
+ *   Form array.
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ *   Form state.
+ */
+function _contacts_reset_facet_filters(array &$form, FormStateInterface $form_state) {
+  $facet_source_id = 'search_api:views_block__contacts_dashboard_indexed__full';
+  $cache_key = StatefulQuerystringUrlProcessor::getCacheKey($facet_source_id);
+
+  if (\Drupal::request()->hasSession()) {
+    \Drupal::request()->getSession()->remove($cache_key);
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for user_pass_reset.
+ */
+function contacts_form_user_pass_reset_alter(&$form, FormStateInterface $form_state, $form_id) {
+  if (Drupal::moduleHandler()->moduleExists('email_registration')) {
+    // By default the reset password form uses the account's account name as
+    // part of the message "This is a one-time login for %user_name". Usernames
+    // aren't relevant when we're using email registration, so swap it out for
+    // the email address.
+    // @todo Remove once this issue is fixed:
+    // https://www.drupal.org/project/email_registration/issues/3065842
+    /** @var \Drupal\Core\StringTranslation\TranslatableMarkup $message */
+    /** @var \Drupal\Core\Session\AccountInterface $user */
+    $user = $form_state->getBuildInfo()['args'][0];
+    $message = $form['message']['#markup'];
+    $arguments = $message->getArguments();
+    $arguments['%user_name'] = $user->getEmail();
+    // Disable coding standards for this line as it doesn't like passing
+    // non-literal strings to TranslatableMarkup, but that's exactly what we
+    // want here.
+    // phpcs:disable Drupal.Semantics.FunctionT.NotLiteralString
+    $form['message']['#markup'] = new TranslatableMarkup($message->getUntranslatedString(), $arguments);
+    // phpcs:enable
+  }
+}
+
+/**
+ * Implements hook_entity_extra_field_info_alter().
+ */
+function contacts_entity_extra_field_info_alter(&$info) {
+  /** @var \Drupal\contacts\PseudoEmailField $pseudo_email_field */
+  $pseudo_email_field = \Drupal::service('contacts.pseudo_email_field');
+  $pseudo_email_field->extraFieldDefinitions($info);
+}
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter() for user_form.
+ */
+function contacts_form_user_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  /** @var \Drupal\contacts\PseudoEmailField $pseudo_email_field */
+  // Set up the pseudo email field within the user form, if configured.
+  $pseudo_email_field = \Drupal::service('contacts.pseudo_email_field');
+  $pseudo_email_field->userFormAlter($form, $form_state, $form_id);
+
+  /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $display */
+  $display = $form_state->get('form_display');
+
+  $form['#validate'][] = 'contacts_user_form_validate';
+
+  // By default, Drupal will auto-fill user info from cookies (such as username
+  // email etc). We explicitly don't want this for the user form and its
+  // derivatives.
+  unset($form['#attributes']['data-user-info-from-browser']);
+
+  // If the password policy module is installed, invoke its form alter but
+  // not for our AddContactsForm. See contacts_module_implements_alter.
+  if (function_exists('password_policy_form_user_form_alter')) {
+    if ($display->id() !== 'user.user.add_contact_organisation' && $display->id() !== 'user.user.add_contact_individual') {
+      password_policy_form_user_form_alter($form, $form_state);
+    }
+  }
+}
+
+/**
+ * Validate callback for the user form.
+ *
+ * @param array $form
+ *   Form.
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ *   State.
+ *
+ * @see contacts_form_user_form_alter
+ */
+function contacts_user_form_validate(array &$form, FormStateInterface $form_state) {
+  // Do not allow users to have both the indiv and org roles.
+  if (isset($form['account']['roles'])) {
+    $roles = $form_state->getValue('roles') ?? [];
+    if (in_array('crm_indiv', $roles) && in_array('crm_org', $roles)) {
+      $role_storage = \Drupal::entityTypeManager()->getStorage('user_role');
+      /** @var \Drupal\user\Entity\Role $indiv_role */
+      /** @var \Drupal\user\Entity\Role $org_role */
+      $indiv_role = $role_storage->load('crm_indiv');
+      $org_role = $role_storage->load('crm_org');
+
+      $form_state->setError($form['account']['roles'], new TranslatableMarkup("A user can't have both the %person and %organisation roles. Please select one or the other, but not both.", [
+        '%person' => $indiv_role->label(),
+        '%organisation' => $org_role->label(),
+      ]));
+    }
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_view() for profile.
+ */
+function contacts_profile_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode) {
+  // Inject our email pseudo field if it's visible.
+  /** @var \Drupal\profile\Entity\Profile $entity */
+  if ($display->getComponent('contacts_mail')) {
+    /** @var \Drupal\user\UserInterface $user */
+    if ($user = $entity->getOwner()) {
+      $mail_field = $user->get('mail');
+
+      $build['mail'] = $mail_field->view([
+        'label' => 'inline',
+      ]);
+    }
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for profile_form.
+ */
+function contacts_form_profile_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  /** @var \Drupal\contacts\PseudoEmailField $pseudo_email_field */
+  // Set up the pseudo email field within the user form, if configured.
+  $pseudo_email_field = \Drupal::service('contacts.pseudo_email_field');
+  $pseudo_email_field->profileFormAlter($form, $form_state, $form_id);
+}
+
+/**
+ * Custom access callback for the restricted account block.
+ *
+ * @param \Drupal\contacts\Plugin\Block\ContactsEntity $block
+ *   The block.
+ * @param \Drupal\Core\Entity\EntityInterface $entity
+ *   The entity.
+ * @param string $op
+ *   The operation being performed.
+ * @param \Drupal\Core\Session\AccountInterface $account
+ *   The account to check access for.
+ *
+ * @return \Drupal\Core\Access\AccessResult
+ *   The access result.
+ */
+function contacts_dashboard_account_form_access(ContactsEntity $block, EntityInterface $entity, string $op, AccountInterface $account) {
+  // Deny access if the user would have access to the unrestricted version.
+  return AccessResult::allowedIf(!$entity->access($op, $account));
+}
+
+/**
+ * Prepares variables for views table axes templates.
+ *
+ * Default template: views-view-table-axes.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - view: A ViewExecutable object.
+ *   - rows: The raw row data.
+ */
+function template_preprocess_views_view_table_axes(array &$variables) {
+  $view = $variables['view'];
+  $result = $variables['result'] = $variables['rows'];
+  $variables['rows'] = [];
+  $variables['header'] = [];
+
+  $options = $view->style_plugin->options;
+  $handler = $view->style_plugin;
+
+  $variables['sticky'] = FALSE;
+  if (!empty($options['sticky'])) {
+    $variables['#attached']['library'][] = 'core/drupal.tableheader';
+    $variables['attributes']['class'][] = 'sticky-enabled';
+  }
+
+  /** @var \Drupal\views\Plugin\views\field\FieldPluginBase[] $fields */
+  $fields = &$view->field;
+
+  // Get our columns.
+  $variables['header'][$options['row']] = '';
+
+  if (isset($options['table_headers'])) {
+    $variables['header'] += $options['table_headers'];
+  }
+  else {
+    foreach ($result as $num => $row) {
+      // If this is a dummy row, don't do anything further.
+      if (!empty($row->_table_axes_dummy)) {
+        continue;
+      }
+
+      $value = $row->_table_axes_column_value ?? $fields[$options['column']]->getValue($row);
+      if (!isset($variables['header'][$value])) {
+        $value = (string) $value;
+        $variables['header'][$value] = $handler->getField($num, $options['column']);
+      }
+    }
+  }
+
+  // Set up our pre headers.
+  if (isset($options['colgroups'])) {
+    $variables['colgroups'][$options['row']] = [];
+    $variables['colgroups'] += $options['colgroups'];
+  }
+
+  // Add our total field.
+  if (!empty($options['total_field'])) {
+    $variables['header']['_total'] = t('Total');
+
+    if (isset($variables['colgroups'])) {
+      $variables['colgroups']['_total'] = [];
+    }
+  }
+
+  // Now loop over and fill out our rows.
+  foreach ($result as $num => $row) {
+    // Get our column/row.
+    $column_value = $row->_table_axes_column_value ?? $fields[$options['column']]->getValue($row);
+    $row_value = $row->_table_axes_row_value ?? $fields[$options['row']]->getValue($row);
+    // Ensure that the row and column values can be used as array indexes.
+    // E.g. casting TranslatableMarkup to strings.
+    $indexable_column_value = $column_value ? (string) $column_value : (string) $handler->getField($num, $options['column']);
+    $indexable_row_value = $row_value ? (string) $row_value : (string) $handler->getField($num, $options['row']);
+
+    // Build our row.
+    if (!isset($variables['rows'][$indexable_row_value])) {
+      $variables['rows'][$indexable_row_value]['data'] = array_fill_keys(array_keys($variables['header']), $options['empty_cell']);
+      $variables['rows'][$indexable_row_value]['data'][$options['row']] = $row->_table_axes_row_label ?? $handler->getField($num, $options['row']);
+
+      if (!empty($row->_table_axes_row_attributes)) {
+        $variables['rows'][$indexable_row_value]['attributes'] = new Attribute($row->_table_axes_row_attributes);
+      }
+    }
+
+    // If this is a dummy row, don't do anything further.
+    if (!empty($row->_table_axes_dummy)) {
+      continue;
+    }
+
+    $column = &$variables['rows'][$indexable_row_value]['data'][$indexable_column_value];
+    if (!is_array($column)) {
+      $column = ['data' => []];
+    }
+    foreach (array_keys($fields) as $field) {
+      // Skip our column/row as we've already handled those.
+      if ($field == $options['column'] || $field == $options['row']) {
+        continue;
+      }
+
+      if (empty($fields[$field]->options['exclude'])) {
+        // phpcs:ignore Drupal.Arrays.Array.LongLineDeclaration
+        $column['data'][$field][] = ['#markup' => $handler->getField($num, $field)];
+      }
+    }
+
+    // Add to our total, if required.
+    if (!empty($options['total_field'])) {
+      $variables['rows'][$indexable_row_value]['data']['_total'] += $fields[$options['total_field']]->getValue($row);
+    }
+
+    // If we have a percentage total, add that into the row.
+    if (isset($row->_percentage_total)) {
+      $variables['rows'][$indexable_row_value]['#percentage_total'] = $row->_percentage_total;
+    }
+  }
+
+  // Loop over our totals and render them as the single values get rendered.
+  if (!empty($options['total_field'])) {
+    $total_handler = $fields[$options['total_field']];
+    foreach ($variables['rows'] as &$row) {
+      // Add our total column.
+      $result_row = new ResultRow();
+      $result_row->{$total_handler->field_alias} = $row['data']['_total'];
+      $row['data']['_total'] = $fields[$options['total_field']]->render($result_row);
+
+      // Render our percentages, if requested.
+      if (!empty($options['percentage'])) {
+        // phpcs:ignore Drupal.Arrays.Array.LongLineDeclaration
+        $total = $row['#percentage_total'] ?? str_replace([' ', ','], '', $row['data']['_total']);
+        if (empty($total)) {
+          continue;
+        }
+
+        foreach (array_keys($row['data']) as $field) {
+          // Skip our column/row as we've already handled those.
+          if ($field === $options['row'] || ($field === '_total' && !isset($row['#percentage_total']))) {
+            continue;
+          }
+
+          if (!is_array($row['data'][$field])) {
+            $value = $row['data'][$field];
+            $row['data'][$field] = [
+              $options['total_field'] => ['#markup' => $value],
+            ];
+          }
+          else {
+            $value = $row['data'][$field][$options['total_field']]['#markup'];
+          }
+
+          $value = str_replace([' ', ','], '', strip_tags($value));
+          if (empty($value)) {
+            continue;
+          }
+          $row['data'][$field]['_percentage'] = [
+            '#type' => 'html_tag',
+            '#tag' => 'small',
+            '#value' => round($value / $total * 100, 1, PHP_ROUND_HALF_EVEN) . '%',
+            '#prefix' => ' ',
+          ];
+          if (!empty($options['percentage_title'])) {
+            $row['data'][$field]['_percentage']['#attributes']['title'] = $options['percentage_title'];
+          }
+        }
+      }
+    }
+  }
+
+  // Add the caption to the list if set.
+  if (!empty($handler->options['caption'])) {
+    $variables['caption'] = ['#markup' => $handler->options['caption']];
+    $variables['caption_needed'] = TRUE;
+  }
+  elseif (!empty($variables['title'])) {
+    $variables['caption'] = ['#markup' => $variables['title']];
+    $variables['caption_needed'] = TRUE;
+  }
+  else {
+    $variables['caption'] = '';
+    $variables['caption_needed'] = FALSE;
+  }
+
+  $variables['summary'] = $handler->options['summary'];
+  $variables['description'] = $handler->options['description'];
+  $variables['caption_needed'] |= !empty($variables['summary']) || !empty($variables['description']);
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function contacts_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  Dashboard::fastHookFormAlter($form, $form_state, $form_id, 'contacts.dashboard');
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for commerce_order_add_form.
+ */
+function contacts_form_commerce_order_add_form_alter(array &$form, FormStateInterface $form_state): void {
+  contacts_commerce_customer_form_alter($form, $form_state);
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for commerce_order_reassign_form.
+ */
+function contacts_form_commerce_order_reassign_form_alter(array &$form, FormStateInterface $form_state): void {
+  contacts_commerce_customer_form_alter($form, $form_state);
+}
+
+/**
+ * Alter the commerce customer forms.
+ *
+ * @param array $form
+ *   The form array.
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ *   The form state.
+ */
+function contacts_commerce_customer_form_alter(array &$form, FormStateInterface $form_state): void {
+  if (isset($form['customer']['uid']) && $form['customer']['uid']['#type'] === 'entity_autocomplete') {
+    $form['customer']['uid']['#placeholder'] = new TranslatableMarkup('Search by name or email address');
+    $form['customer']['uid']['#selection_handler'] = 'search_api';
+    $form['customer']['uid']['#selection_settings'] = [
+      'index' => 'contacts_index',
+    ];
+  }
+}
+
+/**
+ * Implements hook_menu_local_actions_alter().
+ */
+function contacts_menu_local_actions_alter(&$local_actions) {
+  $config = \Drupal::config('contacts.configuration');
+  $contact_form_type = $config->get('add_contact_form_type') ?? 'legacy';
+
+  if ($contact_form_type === 'legacy') {
+    // If we're using the old/legacy 'Add Contact' forms then we need to add
+    // attributes to the menu items so they open in a modal dialog.
+    $local_actions['contacts.contact_add_org']['options']['attributes'] = [
+      'class' => ['use-ajax'],
+      'data-dialog-type' => 'modal',
+      'data-ajax-progress' => 'fullscreen',
+    ];
+    $local_actions['contacts.contact_add_indiv']['options']['attributes'] = [
+      'class' => ['use-ajax'],
+      'data-dialog-type' => 'modal',
+      'data-ajax-progress' => 'fullscreen',
+    ];
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for entity_merge_verify_form.
+ */
+function contacts_form_entity_merge_verify_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  // If entity_merge module is installed, add a validation handler to ensure
+  // an individual and an organisation can't be merged with each other.
+  $route_match = \Drupal::routeMatch();
+
+  if ($route_match->getParameter('entity_type') === 'user') {
+    $user_storage = \Drupal::entityTypeManager()->getStorage('user');
+    $primary_id = $route_match->getParameter('primary_id');
+    $secondary_id = $route_match->getParameter('secondary_id');
+
+    /** @var \Drupal\user\UserInterface $primary */
+    /** @var \Drupal\user\UserInterface $secondary */
+    $primary = $user_storage->load($primary_id);
+    $secondary = $user_storage->load($secondary_id);
+
+    if ($primary && $secondary) {
+      $primary_indiv_secondary_org = $primary->hasRole('crm_indiv') && $secondary->hasRole('crm_org');
+      $primary_org_secondary_indiv = $primary->hasRole('crm_org') && $secondary->hasRole('crm_indiv');
+      if ($primary_indiv_secondary_org || $primary_org_secondary_indiv) {
+        \Drupal::messenger()->addError(new TranslatableMarkup('Cannot merge an individual with an organisation.'));
+        $form['merge']['actions']['submit']['#access'] = FALSE;
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert() for search_api.
+ */
+function contacts_search_api_index_insert(EntityInterface $entity) {
+  // When our contacts index is inserted, we want to index users so they
+  // show up on the contacts dashboard. However, we don't want to necessarily
+  // do this for existing systems that may have many users, so only do it if
+  // the number of users in the system is less than the
+  // default entity batch size. We only want to do this for new installs of
+  // contacts, not from config sync.
+  /** @var \Drupal\search_api\Entity\Index $entity */
+  if ($entity->id() === 'contacts_index') {
+    try {
+      $batch_size = Settings::get('entity_update_batch_size', 50);
+      $count = $entity->getTrackerInstance()->getRemainingItemsCount();
+      if ($count < $batch_size && !\Drupal::isConfigSyncing()) {
+        $entity->indexItems();
+      }
+    }
+    catch (SearchApiException $ex) {
+      // If indexing fails silently give up and just log the error, we don't
+      // want to prevent the installation process.
+      watchdog_exception('contacts', $ex);
+    }
+  }
+}
+
+/**
+ * Implements hook_module_implements_alter().
+ */
+function contacts_module_implements_alter(&$implementations, $hook) {
+  // If the password_policy module is installed, it hooks into the user form
+  // with password_policy_form_user_form_alter, however these changes are only
+  // compatible with the standard user form and not our custom AddContactsForm.
+  // Remove the password policy hook and ensure it's only conditionally invoked.
+  // See contacts_form_user_form_alter.
+  if ($hook === 'form_user_form_alter' && isset($implementations['password_policy'])) {
+    unset($implementations['password_policy']);
+  }
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for input elements.
+ */
+function contacts_preprocess_input(&$variables) {
+  if (isset($variables['element']['#type']) && $variables['element']['#type'] == 'entity_autocomplete') {
+    $variables['#attached']['library'][] = 'contacts/multiline_autocomplete';
+  }
+}
+
+/**
+ * Implements hook_field_widget_WIDGET_TYPE_form_alter() for name_default.
+ */
+function contacts_field_widget_name_default_form_alter(&$element, FormStateInterface $form_state, $context) {
+  // Hide the crm_name field label.
+  // @todo Remove this if Name provides a way to do this natively.
+  // see https://www.drupal.org/project/name/issues/3325339.
+  if (isset($context['items']) && $context['items']->getName() === 'crm_name') {
+    $element['#title_display'] = 'none';
+  }
+}
+
+/**
+ * Implements hook_field_widget_WIDGET_TYPE_form_alter() for address_default.
+ */
+function contacts_field_widget_address_default_form_alter(&$element, FormStateInterface $form_state, $context) {
+  // Ensure that the address section is not collapsible.
+  // By default it renders as #type => 'details' which is collapsible.
+  if (isset($context['items']) && ($context['items']->getName() === 'crm_address' || $context['items']->getName() === 'crm_org_address')) {
+    $element['#type'] = 'container';
+  }
+}

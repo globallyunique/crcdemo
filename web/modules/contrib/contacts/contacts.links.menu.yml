@@ -1,0 +1,19 @@
+contacts.collection:
+  title: Contacts
+  route_name: contacts.collection
+  description: 'Manage user accounts, including decoupled users.'
+  parent: system.admin
+  weight: 5
+
+# Contact tab menu items definition
+entity.contact_tab.collection:
+  title: 'Contact tabs'
+  route_name: entity.contact_tab.collection
+  parent: system.admin_structure
+  weight: 99
+
+contacts.configuration:
+  title: 'Contacts configuration'
+  parent: user.admin_index
+  description: 'Configure contacts basic settings.'
+  route_name: contacts.basic_config

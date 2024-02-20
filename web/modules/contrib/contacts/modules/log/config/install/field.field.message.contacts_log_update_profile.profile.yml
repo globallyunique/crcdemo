@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.message.profile
+    - message.template.contacts_log_update_profile
+id: message.contacts_log_update_profile.profile
+field_name: profile
+entity_type: message
+bundle: contacts_log_update_profile
+label: Profile
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:profile'
+  handler_settings: {  }
+field_type: entity_reference

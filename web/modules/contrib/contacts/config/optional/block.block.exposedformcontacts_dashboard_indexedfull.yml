@@ -1,0 +1,29 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - views.view.contacts_dashboard_indexed
+  module:
+    - contacts
+    - system
+    - views
+  theme:
+    - claro
+id: exposedformcontacts_dashboard_indexedfull
+theme: claro
+region: sidebar_first
+weight: 0
+provider: null
+plugin: 'views_exposed_filter_block:contacts_dashboard_indexed-full'
+settings:
+  id: 'views_exposed_filter_block:contacts_dashboard_indexed-full'
+  label: ''
+  provider: views
+  label_display: '0'
+  views_label: ''
+visibility:
+  request_path:
+    id: request_path
+    pages: /admin/contacts
+    negate: false
+    context_mapping: {  }

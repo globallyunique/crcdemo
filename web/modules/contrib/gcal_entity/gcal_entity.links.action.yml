@@ -1,0 +1,15 @@
+entity.gcal_entity.add_form:
+  route_name: entity.gcal_entity.add_form
+  title: 'Add GCal Entity'
+  appears_on:
+    - entity.gcal_entity.collection
+
+gcal_entity.config:
+  path: 'admin/config/gcal_entity/config'
+  defaults:
+    _form: '\Drupal\gcal_entity\Form\GcalConfigForm'
+    _title: 'Gcal Entity Configuration Form'
+  requirements:
+    _permission: 'access administration pages'
+  options:
+    _admin_route: TRUE

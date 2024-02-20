@@ -1,0 +1,7 @@
+name: 'patient_view'
+type: module
+description: 'customization to support behavior of the patient view'
+package: Custom
+core_version_requirement: ^10
+dependencies:
+  - utility_functions

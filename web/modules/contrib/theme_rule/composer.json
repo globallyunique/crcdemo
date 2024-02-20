@@ -1,0 +1,19 @@
+{
+    "name": "drupal/theme_rule",
+    "type": "drupal-module",
+    "description": "Shows pages using different themes based on site builder's defined conditions",
+    "authors": [
+        {
+            "name": "Claudiu Cristea",
+            "email": "clau.cristea@gmail.com",
+            "homepage": "https://www.drupal.org/u/claudiucristea"
+        }
+    ],
+    "license": "GPL-2.0+",
+    "homepage": "https://www.drupal.org/project/theme_rule",
+    "minimum-stability": "dev",
+    "support": {
+        "issues": "https://www.drupal.org/project/issues/theme_rule",
+        "source": "https://https://git.drupalcode.org/project/theme_rule"
+    }
+}

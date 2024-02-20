@@ -1,0 +1,29 @@
+<?php
+
+/**
+ * @file
+ * Installation file of the Mix module.
+ */
+
+/**
+ * Set default configuration for the Mix meta tags.
+ */
+function mix_update_8101(&$sandbox) {
+  $config_factory = \Drupal::configFactory();
+  $config = $config_factory->getEditable('mix.settings');
+  $meta = [
+    'frontpage' => [
+      'active' => FALSE,
+      'title' => '[site:name]',
+      'description' => '',
+      'keywords' => '',
+      'metatags' => '',
+    ],
+    'node' => [
+      'active' => FALSE,
+      'description' => '[node:summary]',
+    ],
+  ];
+  $config->set('meta', $meta);
+  $config->save(TRUE);
+}

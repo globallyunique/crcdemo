@@ -1,0 +1,36 @@
+mix.settings:
+  path: '/admin/config/mix'
+  defaults:
+    _title: 'Mix settings'
+    _form: 'Drupal\mix\Form\SettingsForm'
+  requirements:
+    _permission: 'administer site configuration'
+
+mix.site_500:
+  path: '/system/500/mix'
+  defaults:
+    _title: 'Unexpected error'
+    _controller: '\Drupal\mix\Controller\MixUnexpectedErrorPageController::build'
+  requirements:
+    _permission: 'access content'
+  options:
+    no_cache: true
+
+mix.content_sync:
+  path: '/api/mix/content-sync/{content_sync_id}/{action}'
+  defaults:
+    _title: 'Content Sync API'
+    _controller: '\Drupal\mix\Controller\MixContentSyncController::ajaxCallback'
+  requirements:
+    _permission: 'administer site configuration'
+
+mix.meta_settings:
+  path: '/admin/config/mix/meta'
+  defaults:
+    _title: 'Meta tags'
+    _form: 'Drupal\mix\Form\MetaSettingsForm'
+  requirements:
+    _permission: 'administer site configuration'
+
+route_callbacks:
+  - '\Drupal\mix\Routing\MixRoutes::routes'

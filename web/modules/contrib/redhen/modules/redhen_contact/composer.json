@@ -1,0 +1,12 @@
+{
+    "name": "drupal/redhen_contact",
+    "description": "Contacts, the central entity in Redhen, and associated features. This file required for the 'extra' section.",
+    "type": "drupal-module",
+    "extra": {
+        "drush": {
+            "services": {
+                "drush.services.yml": "^9"
+            }
+        }
+    }
+}

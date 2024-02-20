@@ -1,0 +1,78 @@
+<?php
+
+/**
+ * @file
+ * Contains theme override functions and preprocess functions
+ */
+
+use Drupal\file\Entity\File;
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * @file
+ * Implements theme_preprocess_page().
+*/
+function dark_responsive_preprocess_page(&$variables) {
+  if ($variables['is_front']) {
+    if (theme_get_setting('show_hide_video', 'dark_responsive') == 1) {
+      $variables['show_hide_video'] = 1;
+      $variables['slider_content'] = dark_responsive_get_slider_content();
+    }
+  }
+   // Footer Social Icons Variable.
+   $variables['show_social_icons'] = theme_get_setting('show_social_icons');
+   $variables['facebook_url'] = theme_get_setting('facebook_url');
+   $variables['instagram_url'] = theme_get_setting('instagram_url');
+   $variables['twitter_url'] = theme_get_setting('twitter_url');
+   $variables['youtube_url'] = theme_get_setting('youtube_url');
+ 
+   // Footer Social Icons Variable.
+   $variables['show_hide_copyright'] = theme_get_setting('show_hide_copyright');
+   $variables['copyright_text'] = theme_get_setting('copyright_text');
+}
+
+function dark_responsive_get_slider_content() {
+  $slider_content = [];
+  for ($i = 1; $i <= 3; $i++) {
+    $vid = theme_get_setting('slide' . $i . '_video', 'dark_responsive');
+    if (!empty($vid)) {
+      $file = File::load($vid[0]);
+      $uri = $file->getFileUri();
+      $video_path = \Drupal::service('file_url_generator')->generateAbsoluteString($uri);
+    }
+    else {
+      $video_path = \Drupal::service('extension.list.theme')->getPath('dark_responsive') . '/assets/video/background' . $i . '.mp4';
+    }
+    $slider_content[$i] ='
+      <video class ="d-block" autoplay loop muted style="width:100%; height:auto;">
+        <source src="' . $video_path . '" type="video/mp4" />
+      </video>
+      <div class="carousel-caption">
+        <h2 class="slider-title animate__heartBeat">' . theme_get_setting('slide' . $i . '_title', 'dark_responsive') . '</h2>
+        <div class="clearfix"><p class="slider-description animate__heartBeat">' . theme_get_setting('slide' . $i . '_description', 'dark_responsive') . '</p>
+        </div>
+      </div>';
+  }
+  return $slider_content;
+}
+
+/**
+ * Dark responsive settings form submit.
+ */
+function dark_responsive_settings_form_submit(&$form, FormStateInterface $form_state) {
+  $account = \Drupal::currentUser();
+  $values = $form_state->getValues();
+  for ($i = 1; $i <= 2; $i++) {
+    if (isset($values["slide{$i}_video"]) && !empty($values["slide{$i}_video"])) {
+      // Load the file via file.fid.
+      if ($file = File::load($values["slide{$i}_video"][0])) {
+        $uri = $file->getFileUri();
+        $video_path = \Drupal::service('file_url_generator')->generateAbsoluteString($uri, $account->id());
+      }
+      else {
+        $video_path = base_path() .'/assets/video/background1.mp4';
+      }
+    }
+  }
+}
+

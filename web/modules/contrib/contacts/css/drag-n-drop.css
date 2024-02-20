@@ -1,0 +1,108 @@
+.drag-area {
+  min-height: 100px;
+  padding: 20px;
+  margin: 10px 0;
+  border: 3px lightblue dashed;
+}
+
+.btn.dnd-manage,
+.btn.dnd-manage:hover {
+  background-color: #636c72;
+  border-color: #636c72;
+  position: absolute;
+  left: -65px;
+  box-shadow: none !important;
+}
+
+.contacts-ajax-tabs:not(.editing) .add-tab {
+  display: none;
+}
+.contacts-ajax-tabs .add-tab .nav-link {
+  background: lightblue;
+  color: #fff;
+  font-weight: bold;
+}
+.contacts-ajax-tabs.editing .nav-link:hover,
+.contacts-ajax-tabs.editing .nav-link {
+  border: 1px dashed lightblue;
+  margin: 0 5px;
+  border-bottom: 0;
+}
+.contacts-ajax-tabs .nav-item.add-tab .nav-link:before,
+.contacts-ajax-tabs .nav-item.add-tab .nav-link:after {
+  display: none;
+}
+
+.contacts-ajax-tabs .tab-area-placeholder {
+  width: 40px;
+  max-height: 35px;
+  line-height: 1.2em;
+  background-color: beige;
+  margin-bottom: 20px;
+  border-color: blue !important;
+}
+.contacts-ajax-tabs .tab-area-placeholder:before,
+.contacts-ajax-tabs .tab-area-placeholder:after {
+  background-image: none !important;
+}
+
+.list-group.collapse {
+  display: none;
+}
+
+.drag-area.show.highlighted {
+  border: 3px blue dashed;
+  background: beige;
+}
+
+.draggable.card {
+  margin-bottom: 20px;
+}
+.draggable .display-select {
+  display: none;
+}
+.draggable .card-header.editing .display-select {
+  display: inherit;
+}
+.draggable .card-header input[disabled] {
+  max-width: 140px;
+  background: none;
+  border: 0;
+  font-weight: bold;
+}
+.draggable .card-header:before {
+  height: 15px;
+  width: 25px;
+  background-position: 0px -2px;
+  background-size: 20px;
+  margin-bottom: -2px;
+}
+
+.drag-area-placeholder {
+  height: 40px;
+  line-height: 1.2em;
+  background-color: #ccc;
+  margin-bottom: 20px;
+}
+
+.draggable-active {
+  background-color: #f5f5f5;
+  margin-bottom: 20px;
+}
+.draggable-active .dnd-content {
+  max-height: 85px;
+  overflow: hidden;
+}
+.draggable-active .dnd-content .field {
+  height: 10px;
+  width: 93%;
+  background-color: #ccc;
+  font-size: 0;
+  padding: 0;
+  margin: 15px auto;
+  overflow: hidden;
+  max-width: 93%;
+  -ms-flex: 0 0 85%;
+  flex: 0 0 85%;
+  display: block;
+}

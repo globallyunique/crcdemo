@@ -1,0 +1,22 @@
+uuid: 59e89d5c-549e-41e6-9ba4-80331ab65ddc
+langcode: en
+status: true
+dependencies:
+  module:
+    - system
+  theme:
+    - dark_responsive
+_core:
+  default_config_hash: NjcxOBrPOiK5-38t56DwFBDVY4yer7YSlbRWXFuHe7A
+id: dark_responsive_breadcrumbs
+theme: dark_responsive
+region: breadcrumb
+weight: 0
+provider: null
+plugin: system_breadcrumb_block
+settings:
+  id: system_breadcrumb_block
+  label: Breadcrumbs
+  label_display: '0'
+  provider: system
+visibility: {  }

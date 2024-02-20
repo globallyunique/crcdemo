@@ -1,0 +1,13 @@
+preset:
+  version: 1.0.0
+  css:
+    theme:
+      css/mix-preset.css: {}
+dropdown:
+  version: 1.0.0
+  css:
+    theme:
+      css/dropdown.css: {}
+hide_submit:
+  js:
+    js/hide_submit.js: {}

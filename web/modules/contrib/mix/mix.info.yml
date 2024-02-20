@@ -1,0 +1,11 @@
+name: Mix
+type: module
+description: A collection of simple but useful features for site building, management, development and user experience improving.
+package: Administration
+core_version_requirement: ^8.8 || ^9 || ^10
+configure: mix.settings
+
+# Information added by Drupal.org packaging script on 2023-11-17
+version: '1.9.0'
+project: 'mix'
+datestamp: 1700236884

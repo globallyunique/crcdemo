@@ -1,0 +1,25 @@
+uuid: 256afb3e-4564-47ec-862e-fa98d4a70dd8
+langcode: en
+status: true
+dependencies:
+  config:
+    - system.menu.main
+  module:
+    - system
+  theme:
+    - dark_responsive
+id: dark_responsive_mainnavigation
+theme: dark_responsive
+region: nav_main
+weight: 0
+provider: null
+plugin: 'system_menu_block:main'
+settings:
+  id: 'system_menu_block:main'
+  label: 'Main navigation'
+  label_display: '0'
+  provider: system
+  level: 1
+  depth: 0
+  expand_all_items: false
+visibility: {  }

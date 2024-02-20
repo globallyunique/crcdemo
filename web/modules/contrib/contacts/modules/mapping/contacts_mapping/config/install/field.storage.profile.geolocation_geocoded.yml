@@ -1,0 +1,23 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - contacts_mapping
+    - geofield
+    - profile
+  enforced:
+    module:
+      - contacts_mapping
+id: profile.geolocation_geocoded
+field_name: geolocation_geocoded
+entity_type: profile
+type: geofield
+settings:
+  backend: geofield_backend_default
+module: geofield
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

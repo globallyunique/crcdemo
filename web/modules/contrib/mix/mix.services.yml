@@ -1,0 +1,27 @@
+services:
+  mix.event_subscriber:
+    class: Drupal\mix\EventSubscriber\MixSubscriber
+    arguments: ['@config.factory', '@current_user', '@url_generator', '@messenger', '@page_cache_kill_switch']
+    tags:
+      - { name: event_subscriber }
+  mix.config_import_ignore_event_subscriber:
+    class: Drupal\mix\EventSubscriber\MixConfigImportIgnoreEventSubscriber
+    arguments: ['@config.factory', '@config.storage', '@config.storage.sync']
+    tags:
+      - { name: event_subscriber }
+  mix.exception_subscriber:
+    class: Drupal\mix\EventSubscriber\MixExceptionHtmlSubscriber
+    arguments: ['@config.factory']
+    tags:
+      - { name: event_subscriber }
+  mix.content_sync_subscriber:
+    class: Drupal\mix\EventSubscriber\MixContentSyncSubscriber
+    tags:
+      - { name: event_subscriber }
+  mix.config_overrider:
+    class: Drupal\mix\Config\ConfigOverrider
+    arguments: ['@config.factory']
+    tags:
+      - { name: config.factory.override, priority: 5 }
+  mix.cache.backend.null:
+    class: Drupal\mix\Cache\NullBackendFactory

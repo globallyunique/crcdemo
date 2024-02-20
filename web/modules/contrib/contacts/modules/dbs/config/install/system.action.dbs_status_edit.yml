@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - contacts_dbs
+id: dbs_status_edit
+label: 'Edit DBS Status'
+type: dbs_status
+plugin: dbs_status_edit
+configuration: {  }

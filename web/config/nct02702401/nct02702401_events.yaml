@@ -1,0 +1,18 @@
+uuid: 75e8d4a5-f21f-4c33-94f5-e78aa9f6fa53
+study: 'NCT02702401'
+periods:
+  screening:
+    label: 'Screening'
+    events:
+      screening:
+        label: 'Screening'
+        workflow: 'w1_nct02702401'
+  treatment:
+    label: 'Treatment'
+    events:
+      visit_1:
+        label: 'Visit 1'
+        workflow: 'w2_nct02702401'
+      visit_2:
+        label: 'Visit 2'
+        workflow: 'w2_nct02702401'    

@@ -1,0 +1,2 @@
+mix.local_tasks:
+  deriver: 'Drupal\mix\Plugin\Derivative\MixLocalTask'

@@ -1,0 +1,36 @@
+diff --git a/lib/Drupal/Component/Utility/Html.php b/lib/Drupal/Component/Utility/Html.php
+index 7271519e51..c5aa88d940 100644
+--- a/core/lib/Drupal/Component/Utility/Html.php
++++ b/core/lib/Drupal/Component/Utility/Html.php
+@@ -425,6 +425,31 @@ EOD;
+    * @ingroup sanitization
+    */
+   public static function escape($text): string {
++
++    // Temporary fix to mask TypeError WSOD if Argument in $text is Array instead of Text.
++    // See core issue https://www.drupal.org/node/3352384 for more.
++    // See change record for if NULL https://www.drupal.org/node/3318826 as example.
++    if (is_array($text)) {
++      // @todo Add InvalidArgumentException extends Exception
++      // in namespace \Drupal\Component\Utility\Html
++      // to execute the following inside a new Exception.
++      $message = 'Passing Argument of Type Array to ' . __METHOD__ . ' will trigger a PHP TypeError in drupal:9.5.7 and higher. Pass a string instead. See https://www.drupal.org/node/3352384 for more. To find out more about the Array given instead of String, use var_dump() or Devel dpm() by uncommenting line 440-447 in \Drupal\Component\Utility\Html.php.';
++      @trigger_error($message, E_USER_DEPRECATED);
++      \Drupal::messenger()->addMessage($message, 'error', FALSE);
++
++      // Enable (uncomment) for debugging only.
++      //
++      // if (\Drupal::moduleHandler()->moduleExists('devel')) {
++      // dpm($text);
++      // }
++      // else {
++      // var_dump($text);
++      // }
++
++      // To prevent site being not operable we suppress TypeError in case of type Array
++      // by converting into type Text before substitution.
++      return htmlspecialchars((string) $text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
++    }
+     if (is_null($text)) {
+       @trigger_error('Passing NULL to ' . __METHOD__ . ' is deprecated in drupal:9.5.0 and will trigger a PHP error from drupal:11.0.0. Pass a string instead. See https://www.drupal.org/node/3318826', E_USER_DEPRECATED);
+       return '';

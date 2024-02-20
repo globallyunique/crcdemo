@@ -1,0 +1,50 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - profile.type.crm_indiv
+    - profile.type.crm_notes
+    - profile.type.crm_org
+  module:
+    - contacts
+    - crm_tools
+    - profile
+    - system
+    - toolbar
+third_party_settings:
+  crm_tools:
+    crm_tools_icon: person
+id: crm_manager
+label: 'CRM Manager'
+weight: 5
+is_admin: null
+permissions:
+  - 'access administration pages'
+  - 'access toolbar'
+  - 'access user profiles'
+  - 'add contacts'
+  - 'create crm_indiv profile'
+  - 'create crm_notes profile'
+  - 'create crm_org profile'
+  - 'delete any crm_indiv profile'
+  - 'delete any crm_notes profile'
+  - 'delete any crm_org profile'
+  - 'delete own crm_indiv profile'
+  - 'delete own crm_notes profile'
+  - 'delete own crm_org profile'
+  - 'manage contacts dashboard'
+  - 'update any crm_indiv profile'
+  - 'update any crm_notes profile'
+  - 'update any crm_org profile'
+  - 'update own crm_indiv profile'
+  - 'update own crm_notes profile'
+  - 'update own crm_org profile'
+  - 'view any crm_indiv profile'
+  - 'view any crm_notes profile'
+  - 'view any crm_org profile'
+  - 'view any profile'
+  - 'view contacts'
+  - 'view own crm_indiv profile'
+  - 'view own crm_notes profile'
+  - 'view own crm_org profile'
+  - 'view own profile'

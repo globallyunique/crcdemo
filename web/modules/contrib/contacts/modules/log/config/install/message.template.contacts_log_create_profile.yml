@@ -1,0 +1,16 @@
+langcode: en
+status: true
+dependencies: {  }
+template: contacts_log_create_profile
+label: 'Profile Created'
+description: 'A new profile is created.'
+text:
+  -
+    value: "<p>[message:profile:entity:type-label]&nbsp;profile created.</p>\r\n"
+    format: basic_html
+settings:
+  'token options':
+    clear: false
+    'token replace': true
+  purge_override: false
+  purge_methods: {  }

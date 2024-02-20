@@ -1,0 +1,95 @@
+contacts.relationship.*:
+  type: mapping
+  label: 'Relationship'
+  mapping:
+    id:
+      type: string
+      label: 'Plugin ID'
+    name:
+      type: string
+      label: 'Context name'
+    source:
+      type: string
+      label: 'Source context'
+
+contacts.block_plugin.*:
+  type: block.settings.[id]
+  mapping:
+    name:
+      type: string
+      label: 'Name'
+    context_mapping:
+      type: sequence
+      label: 'Context assignments'
+      sequence:
+        - type: string
+    region:
+      type: string
+      label: 'Region'
+    weight:
+      type: integer
+      label: 'Weight'
+
+block.settings.contacts_entity:*:
+  type: block_settings
+  mapping:
+    mode:
+      type: string
+      label: 'Mode'
+    create:
+      type: boolean
+      label: 'Create'
+    operation:
+      type: string
+      label: 'Operation'
+    view_mode:
+      type: string
+      label: 'View mode'
+    edit_link:
+      type: string
+      label: 'Edit link'
+    edit_id:
+      type: string
+      label: 'Edit ID'
+    view_new_text:
+      type: label
+      label: 'No existing text'
+    custom_access:
+      type: string
+      label: 'Custom Access Callback'
+      nullable: true
+
+contacts.configuration:
+  type: config_object
+  label: 'Contacts basic config'
+  mapping:
+    access_denied_redirect:
+      type: boolean
+      label: 'Whether to redirect to login on access denied'
+    redirect_user_page:
+      type: boolean
+      label: 'Whether the /user/{user} page should redirect to user dashboard'
+    unified_login_register:
+      type: boolean
+      label: 'Whether the login and register pages should be unified'
+    coupled_real_name:
+      type: boolean
+      label: 'Whether to use the real name for display names of coupled users'
+    expanded_facet_blocks:
+      type: sequence
+      label: 'Blocks that should be expanded in the contacts dashboard search'
+      sequence:
+        type: string
+        label: 'Block ID'
+    add_contact_form_type:
+      type: string
+      label: 'The type of add contact form to use: "current" or "legacy"'
+    email_required_roles:
+      type: sequence
+      label: 'CRM Roles where the email field is required'
+      sequence:
+        type: string
+        label: 'Role ID'
+    default_contacts_dashboard_route:
+      type: string
+      label: 'Which route should be used as the default page for when accessing the Contacts Dashboard'

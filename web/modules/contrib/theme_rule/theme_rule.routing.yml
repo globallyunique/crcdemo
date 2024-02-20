@@ -1,0 +1,41 @@
+entity.theme_rule.collection:
+  path: '/admin/appearance/theme-rules'
+  defaults:
+    _entity_list: 'theme_rule'
+    _title: 'Theme rules'
+  requirements:
+    _permission: 'administer themes'
+
+theme_rule.rule_add:
+  path: '/admin/appearance/theme-rules/add'
+  defaults:
+    _entity_form: 'theme_rule.add'
+    _title: 'Add theme rule'
+  requirements:
+    _permission: 'administer themes'
+
+entity.theme_rule.enable:
+  path: '/admin/appearance/theme-rules/manage/{theme_rule}/enable'
+  defaults:
+    _controller: Drupal\theme_rule\Controller\ThemeRuleStatusController::toggleStatus
+    _title_callback: Drupal\theme_rule\Controller\ThemeRuleStatusController::getStatusOperationTitle
+    operation: enable
+  requirements:
+    _permission: 'administer themes'
+  options:
+    parameters:
+      theme_rule:
+        type: 'entity:theme_rule'
+
+entity.theme_rule.disable:
+  path: '/admin/appearance/theme-rules/manage/{theme_rule}/disable'
+  defaults:
+    _controller: Drupal\theme_rule\Controller\ThemeRuleStatusController::toggleStatus
+    _title_callback: Drupal\theme_rule\Controller\ThemeRuleStatusController::getStatusOperationTitle
+    operation: disable
+  requirements:
+    _permission: 'administer themes'
+  options:
+    parameters:
+      theme_rule:
+        type: 'entity:theme_rule'

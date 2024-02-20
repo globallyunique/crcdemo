@@ -1,0 +1,20 @@
+name: Simple CRM
+description: "Simple implementation of Decoupled User Authentication for CRM."
+package: Tool
+
+type: module
+core_version_requirement: ^8.8 || ^9 || ^10
+
+dependencies:
+  - decoupled_auth:decoupled_auth
+  - drupal:user
+  - profile:profile
+  - address:address
+  - drupal:datetime
+  - drupal:options
+  - drupal:image
+
+# Information added by Drupal.org packaging script on 2023-04-26
+version: '2.0.0'
+project: 'decoupled_auth'
+datestamp: 1682502945

@@ -1,0 +1,22 @@
+diff --git a/core/lib/Drupal/Core/Layout/LayoutPluginManager.php b/core/lib/Drupal/Core/Layout/LayoutPluginManager.php
+index 2265194bf30bd2bd08b3c7ce8dadd2390ff047f4..176324c2a947df3075b7151efc79d757b2b39207 100644
+--- a/core/lib/Drupal/Core/Layout/LayoutPluginManager.php
++++ b/core/lib/Drupal/Core/Layout/LayoutPluginManager.php
+@@ -198,7 +198,7 @@ public function getCategories() {
+    */
+   public function getSortedDefinitions(array $definitions = NULL, $label_key = 'label') {
+     // Sort the plugins first by category, then by label.
+-    $definitions = $definitions ?? $this->getDefinitions();
++    $definitions = $definitions ?? $this->getFilteredDefinitions('layout_plugin_manager');
+     uasort($definitions, function (LayoutDefinition $a, LayoutDefinition $b) {
+       if ($a->getCategory() != $b->getCategory()) {
+         return strnatcasecmp($a->getCategory(), $b->getCategory());
+@@ -214,7 +214,7 @@ public function getSortedDefinitions(array $definitions = NULL, $label_key = 'la
+    * @return \Drupal\Core\Layout\LayoutDefinition[][]
+    */
+   public function getGroupedDefinitions(array $definitions = NULL, $label_key = 'label') {
+-    $definitions = $this->getSortedDefinitions($definitions ?? $this->getDefinitions(), $label_key);
++    $definitions = $this->getSortedDefinitions($definitions ?? $this->getFilteredDefinitions('layout_plugin_manager'), $label_key);
+     $grouped_definitions = [];
+     foreach ($definitions as $id => $definition) {
+       $grouped_definitions[(string) $definition->getCategory()][$id] = $definition;

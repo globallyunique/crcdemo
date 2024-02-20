@@ -1,0 +1,30 @@
+base:
+  css:
+    base:
+      dist/css/base.css: { minified: true }
+  js:
+    dist/js/base.js: { minified: true }
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/drupalSettings
+    - material_base/clipboard-js 
+
+grid:
+  css:
+    layout:
+      dist/css/grid.css: { minified: true }
+
+fonts:
+  css:
+    component:
+      dist/css/fonts.css: { minified: true }
+
+icons-font:
+  css:
+    component:
+      dist/css/icons-font.css: { minified: true }
+
+clipboard-js:
+  js:
+    js/clipboard.min.js: { minified: true }

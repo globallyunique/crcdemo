@@ -1,0 +1,6 @@
+run_rpa_for_a_system.json:
+  path: '/run_rpa_for_a_system'
+  defaults:
+    _controller: '\Drupal\run_rpa_for_a_system\Controller\CustomJsonController::getJson'
+  requirements:
+    _permission: 'access content'

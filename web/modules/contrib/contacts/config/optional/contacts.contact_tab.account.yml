@@ -1,0 +1,32 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - contacts
+    - user
+id: account
+label: 'User account'
+path: account
+layout: contacts_tab_content.stacked
+weight: 90
+relationships: {  }
+blocks:
+  contacts_entity_user_user:
+    id: 'contacts_entity:user-user'
+    label: 'Account'
+    provider: contacts
+    label_display: '0'
+    mode: form
+    create: null
+    operation: contacts_dashboard
+    view_mode: contacts_dashboard
+    edit_link: content
+    edit_id: edit
+    view_new_text: ''
+    name: contacts_entity_user_user
+    region: left
+    weight: 0
+    context_mapping:
+      entity: user
+roles:
+  crm_indiv: crm_indiv

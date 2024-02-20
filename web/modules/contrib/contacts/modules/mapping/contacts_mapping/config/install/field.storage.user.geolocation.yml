@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - contacts_mapping
+    - user
+  enforced:
+    module:
+      - contacts_mapping
+id: user.geolocation
+field_name: geolocation
+entity_type: user
+type: geofield_override
+settings:
+  backend: geofield_backend_default
+module: contacts_mapping
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

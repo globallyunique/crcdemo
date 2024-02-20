@@ -1,0 +1,10 @@
+{
+  "devDependencies": {
+    "sass": "^1.69.5",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4"
+  },
+  "scripts": {
+    "compile-scss": "npx sass web/themes/contrib/material_base/scss:web/themes/contrib/material_base/dist/css"
+  }
+}

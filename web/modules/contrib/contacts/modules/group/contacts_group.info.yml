@@ -1,0 +1,13 @@
+name: 'Contacts Group'
+type: module
+description: 'Group integration for managing relationships with Organisations.'
+core_version_requirement: ^9 || ^10
+package: 'Contacts'
+
+dependencies:
+  - group:group
+
+# Information added by Drupal.org packaging script on 2023-11-16
+version: '2.2.1'
+project: 'contacts'
+datestamp: 1700128745

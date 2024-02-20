@@ -1,0 +1,4 @@
+gcal_entity:
+  css:
+    base:
+      css/gcal_entity.css: {}

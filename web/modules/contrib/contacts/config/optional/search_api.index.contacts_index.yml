@@ -1,0 +1,312 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.profile.crm_dob
+    - field.storage.profile.crm_gender
+    - field.storage.profile.crm_org_name
+    - field.storage.profile.crm_name
+    - field.storage.profile.crm_address
+    - field.storage.profile.crm_org_address
+    - search_api.server.database_server
+  module:
+    - decoupled_auth
+    - profile
+    - user
+    - search_api
+id: contacts_index
+name: 'Contacts Index'
+description: ''
+read_only: false
+field_settings:
+  crm_dob:
+    label: 'Individual » Profile » Date of Birth'
+    datasource_id: 'entity:user'
+    property_path: 'profile_crm_indiv:entity:crm_dob'
+    type: date
+    dependencies:
+      config:
+        - field.storage.profile.crm_dob
+      module:
+        - decoupled_auth
+        - profile
+  crm_gender:
+    label: 'Individual » Profile » Gender'
+    datasource_id: 'entity:user'
+    property_path: 'profile_crm_indiv:entity:crm_gender'
+    type: string
+    dependencies:
+      config:
+        - field.storage.profile.crm_gender
+      module:
+        - decoupled_auth
+        - profile
+  crm_org_name:
+    label: 'Organisation » Profile » Name'
+    datasource_id: 'entity:user'
+    property_path: 'profile_crm_org:entity:crm_org_name'
+    type: text
+    boost: 21.0
+    dependencies:
+      config:
+        - field.storage.profile.crm_org_name
+      module:
+        - decoupled_auth
+        - profile
+  family:
+    label: 'Individual » Profile » Name » Family'
+    datasource_id: 'entity:user'
+    property_path: 'profile_crm_indiv:entity:crm_name:family'
+    type: text
+    boost: 21.0
+    dependencies:
+      config:
+        - field.storage.profile.crm_name
+      module:
+        - decoupled_auth
+        - profile
+  given:
+    label: 'Individual » Profile » Name » Given'
+    datasource_id: 'entity:user'
+    property_path: 'profile_crm_indiv:entity:crm_name:given'
+    type: text
+    boost: 21.0
+    dependencies:
+      config:
+        - field.storage.profile.crm_name
+      module:
+        - decoupled_auth
+        - profile
+  indiv_address_line1:
+    label: 'Individual » Profile » Address » The first line of the address block.'
+    datasource_id: 'entity:user'
+    property_path: 'profile_crm_indiv:entity:crm_address:address_line1'
+    type: text
+    boost: 2.0
+    dependencies:
+      config:
+        - field.storage.profile.crm_address
+      module:
+        - decoupled_auth
+        - profile
+  indiv_address_line2:
+    label: 'Individual » Profile » Address » The second line of the address block.'
+    datasource_id: 'entity:user'
+    property_path: 'profile_crm_indiv:entity:crm_address:address_line2'
+    type: text
+    dependencies:
+      config:
+        - field.storage.profile.crm_address
+      module:
+        - decoupled_auth
+        - profile
+  indiv_administrative_area:
+    label: 'Individual » Profile » Address » The top-level administrative subdivision of the country.'
+    datasource_id: 'entity:user'
+    property_path: 'profile_crm_indiv:entity:crm_address:administrative_area'
+    type: text
+    dependencies:
+      config:
+        - field.storage.profile.crm_address
+      module:
+        - decoupled_auth
+        - profile
+  indiv_country_code:
+    label: 'Individual » Profile » Address » The two-letter country code.'
+    datasource_id: 'entity:user'
+    property_path: 'profile_crm_indiv:entity:crm_address:country_code'
+    type: text
+    dependencies:
+      config:
+        - field.storage.profile.crm_address
+      module:
+        - decoupled_auth
+        - profile
+  indiv_dependent_locality:
+    label: 'Individual » Profile » Address » The dependent locality (i.e. neighbourhood).'
+    datasource_id: 'entity:user'
+    property_path: 'profile_crm_indiv:entity:crm_address:dependent_locality'
+    type: text
+    dependencies:
+      config:
+        - field.storage.profile.crm_address
+      module:
+        - decoupled_auth
+        - profile
+  indiv_locality:
+    label: 'Individual » Profile » Address » The locality (i.e. city).'
+    datasource_id: 'entity:user'
+    property_path: 'profile_crm_indiv:entity:crm_address:locality'
+    type: text
+    boost: 2.0
+    dependencies:
+      config:
+        - field.storage.profile.crm_address
+      module:
+        - decoupled_auth
+        - profile
+  indiv_postal_code:
+    label: 'Individual » Profile » Address » The postal code.'
+    datasource_id: 'entity:user'
+    property_path: 'profile_crm_indiv:entity:crm_address:postal_code'
+    type: text
+    dependencies:
+      config:
+        - field.storage.profile.crm_address
+      module:
+        - decoupled_auth
+        - profile
+  mail:
+    label: Email
+    datasource_id: 'entity:user'
+    property_path: mail
+    type: text
+    boost: 0.5
+    dependencies:
+      module:
+        - user
+  org_address_line1:
+    label: 'Organisation » Profile » Address » The first line of the address block.'
+    datasource_id: 'entity:user'
+    property_path: 'profile_crm_org:entity:crm_org_address:address_line1'
+    type: text
+    boost: 2.0
+    dependencies:
+      config:
+        - field.storage.profile.crm_org_address
+      module:
+        - decoupled_auth
+        - profile
+  org_address_line2:
+    label: 'Organisation » Profile » Address » The second line of the address block.'
+    datasource_id: 'entity:user'
+    property_path: 'profile_crm_org:entity:crm_org_address:address_line2'
+    type: text
+    dependencies:
+      config:
+        - field.storage.profile.crm_org_address
+      module:
+        - decoupled_auth
+        - profile
+  org_administrative_area:
+    label: 'Organisation » Profile » Address » The top-level administrative subdivision of the country.'
+    datasource_id: 'entity:user'
+    property_path: 'profile_crm_org:entity:crm_org_address:administrative_area'
+    type: text
+    dependencies:
+      config:
+        - field.storage.profile.crm_org_address
+      module:
+        - decoupled_auth
+        - profile
+  org_country_code:
+    label: 'Organisation » Profile » Address » The two-letter country code.'
+    datasource_id: 'entity:user'
+    property_path: 'profile_crm_org:entity:crm_org_address:country_code'
+    type: text
+    dependencies:
+      config:
+        - field.storage.profile.crm_org_address
+      module:
+        - decoupled_auth
+        - profile
+  org_dependent_locality:
+    label: 'Organisation » Profile » Address » The dependent locality (i.e. neighbourhood).'
+    datasource_id: 'entity:user'
+    property_path: 'profile_crm_org:entity:crm_org_address:dependent_locality'
+    type: text
+    dependencies:
+      config:
+        - field.storage.profile.crm_org_address
+      module:
+        - decoupled_auth
+        - profile
+  org_locality:
+    label: 'Organisation » Profile » Address » The locality (i.e. city).'
+    datasource_id: 'entity:user'
+    property_path: 'profile_crm_org:entity:crm_org_address:locality'
+    type: text
+    boost: 2.0
+    dependencies:
+      config:
+        - field.storage.profile.crm_org_address
+      module:
+        - decoupled_auth
+        - profile
+  org_postal_code:
+    label: 'Organisation » Profile » Address » The postal code.'
+    datasource_id: 'entity:user'
+    property_path: 'profile_crm_org:entity:crm_org_address:postal_code'
+    type: text
+    dependencies:
+      config:
+        - field.storage.profile.crm_org_address
+      module:
+        - decoupled_auth
+        - profile
+  roles:
+    label: Roles
+    datasource_id: 'entity:user'
+    property_path: roles
+    type: string
+    dependencies:
+      module:
+        - user
+  uid:
+    label: 'User ID'
+    datasource_id: 'entity:user'
+    property_path: uid
+    type: integer
+    dependencies:
+      module:
+        - user
+datasource_settings:
+  'entity:user':
+    languages:
+      default: true
+      selected: {  }
+processor_settings:
+  add_url: {  }
+  aggregated_field: {  }
+  entity_type: {  }
+  ignorecase:
+    weights:
+      preprocess_index: -10
+      preprocess_query: -10
+    all_fields: false
+    fields:
+      - crm_gender
+      - crm_org_name
+      - family
+      - given
+      - indiv_address_line1
+      - indiv_address_line2
+      - indiv_administrative_area
+      - indiv_country_code
+      - indiv_dependent_locality
+      - indiv_locality
+      - indiv_postal_code
+      - mail
+      - org_address_line1
+      - org_address_line2
+      - org_administrative_area
+      - org_country_code
+      - org_dependent_locality
+      - org_locality
+      - org_postal_code
+      - roles
+  language_with_fallback: {  }
+  rendered_item: {  }
+  role_filter:
+    default: false
+    roles:
+      - crm_indiv
+      - crm_org
+tracker_settings:
+  default:
+    indexing_order: fifo
+options:
+  cron_limit: 50
+  index_directly: true
+  track_changes_in_references: true
+server: database_server

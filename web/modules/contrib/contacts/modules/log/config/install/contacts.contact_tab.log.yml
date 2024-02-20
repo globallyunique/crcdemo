@@ -1,0 +1,38 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - views.view.contacts_log_messages
+  module:
+    - contacts_log
+    - views
+id: log
+label: Log
+path: log
+layout: contacts_tab_content.stacked
+weight: null
+relationships: {  }
+blocks:
+  contacts_log_user_update:
+    id: contacts_log_user_update
+    label: 'User''s update times'
+    provider: contacts_log
+    label_display: '0'
+    name: contacts_log_user_update
+    weight: 0
+    region: top
+    context_mapping:
+      user: user
+  views_block_contacts_log_messages_block_1:
+    name: views_block_contacts_log_messages_block_1
+    id: 'views_block:contacts_log_messages-block_1'
+    weight: 1
+    region: top
+    label: Log
+    provider: views
+    label_display: visible
+    views_label: Log
+    items_per_page: '0'
+    context_mapping:
+      contact_target_id: user
+roles: {  }

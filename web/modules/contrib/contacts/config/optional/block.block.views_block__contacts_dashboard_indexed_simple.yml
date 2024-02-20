@@ -1,0 +1,30 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - views.view.contacts_dashboard_indexed
+  module:
+    - contacts
+    - system
+    - views
+  theme:
+    - claro
+id: views_block__contacts_dashboard_indexed_simple
+theme: claro
+region: sidebar_first
+weight: 0
+provider: null
+plugin: 'views_block:contacts_dashboard_indexed-simple'
+settings:
+  id: 'views_block:contacts_dashboard_indexed-simple'
+  label: ''
+  provider: views
+  label_display: visible
+  views_label: ''
+  items_per_page: none
+visibility:
+  request_path:
+    id: request_path
+    pages: '/admin/contacts/*'
+    negate: false
+    context_mapping: {  }

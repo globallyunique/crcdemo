@@ -1,0 +1,211 @@
+/* Web Browser Default */
+table {
+  display: table;
+  border-collapse: collapse;
+  box-sizing: border-box;
+  text-indent: initial;
+  border-spacing: 0px;
+  border-color: gray;
+}
+
+button, input, optgroup, select, textarea {
+  font-family: inherit;
+  font-size: 100%;
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* Drupal Content */
+* {
+  box-sizing: border-box;
+}
+
+.cke *,
+.toolbar * {
+  box-sizing: content-box;
+}
+
+.layout-container {
+  margin: 0;
+}
+
+.layout-container--page {
+  .main-content__container {
+    @extend .container;
+  }
+
+  flex-grow: 1;
+  display: flex;
+  flex-direction: row;
+}
+
+img,
+embed,
+object,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+html,
+body {
+  min-height: 100vh;
+}
+
+body,
+.dialog-off-canvas-main-canvas,
+.page-container,
+.page-navbar-adjust,
+.page-main {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.page {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: row;
+}
+
+.page-content {
+  flex-grow: 1;
+  display: flex;
+}
+
+.page-sidebar--first {
+  display: flex;
+  order: 1; /* This will place the sidebar first in the row */
+  flex-basis: 25%; 
+  overflow: auto;
+
+  .views-label {
+    font-weight: bold;
+    font-size: .675rem;
+  }
+}
+
+.region-content {
+  display: flex;
+  order: 2; /* This will place the content second in the row */
+  overflow: auto;
+  flex-direction: column;
+  flex-basis: 100%; 
+}
+
+/* added to hide the Apply button on view search forms */
+ .views-exposed-form {
+    .form-actions {
+    display: none;
+  }
+} 
+
+
+/* Add space between table cells */
+.custom-view td,
+.taskconsole-tasks td,
+.custom-view th,
+.taskconsole-tasks th {
+  padding: 8px;
+}
+
+.custom-view th,
+.taskconsole-tasks th {
+  background-color: #f0f0f0;
+  /* Gray background */
+  border: 1px solid #ccc;
+  /* Thin border */
+  text-align: left;
+}
+
+/* Add border to table cells */
+.custom-view td,
+.taskconsole-tasks td {
+  border: 1px solid #ddd;
+}
+
+.custom-view table,
+.taskconsole-tasks table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+/* NAVBAR */
+.navbar-branding__logo {
+  display: block;
+  padding: 12px;
+  height: 64px;
+  width: 64px;
+  margin-right: 0px;
+  }
+ 
+.navbar-branding__title {
+  padding-right: 48px;
+  padding-left: 0px;
+  line-height: 1;
+  font-weight: 400;
+  font-family:"Roboto", "Helvetica", "Arial", sans-serif;
+}
+
+.navbar-branding__title a {
+  font-size: 1.5rem; /* gm - bigger font */
+}
+
+.navbar-branding__slogan {
+  margin-left: 12px;
+  margin-right: 12px;
+  font-size: .675rem;
+}
+
+/* FORMS */
+.js-form-item-filter-table {
+  height: 40px;
+  margin-Left: 8px;
+  font-size: 1.2em;
+}
+
+#edit-filter-table {
+  height: 32px;
+}
+
+/* BLOCKS */
+.block__heading h2 {
+  font-size: 1.25rem;
+  line-height: 2rem;
+  font-weight: 500;
+  font-family: "Roboto",sans-serif;
+  text-transform: uppercase;
+  color: #000;
+}
+
+.block__content {
+  padding-right: 24px;
+}
+
+/* FIX FOR DOB LABEL */
+.field--type-datetime h4 {
+  font-size: 0.675rem;
+  line-height: 0.9rem;
+  font-weight: 500;
+  font-family: "Roboto",sans-serif;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  padding: 0px 0px;
+}
+
+.button input {
+  padding: 2px 16px;
+  color: #ffffff;
+  background-color: #4C5C96;
+}
+
+.contacts-row-image {
+  width: 48px;
+}
+
+.ckeditor-accordion-container a {
+  background-color: #4C5C96;
+}

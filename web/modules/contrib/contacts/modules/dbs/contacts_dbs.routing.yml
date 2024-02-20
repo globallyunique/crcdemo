@@ -1,0 +1,7 @@
+contacts_dbs.edit_status:
+  path: '/admin/dbs-status/edit'
+  defaults:
+    _form: '\Drupal\contacts_dbs\Form\DBSStatusEditStatusForm'
+    _title: 'Edit DBS Status'
+  requirements:
+    _permission: 'manage dbs statuses'

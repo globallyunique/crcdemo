@@ -1,0 +1,107 @@
+# Schema for the configuration files of the Mix module.
+mix.settings:
+  type: config_object
+  label: 'Mix settings'
+  mapping:
+    hide_revision_field:
+      type: boolean
+      label: 'Hide revision field'
+    dev_mode:
+      type: boolean
+      label: 'Enable development mode'
+    hide_submit:
+      type: boolean
+      label: 'Hide submit button'
+    standalone_password_page:
+      type: boolean
+      label: 'Standalone password page'
+    remove_x_generator:
+      type: boolean
+      label: 'Remove X-Generator'
+    show_content_sync_id:
+      type: boolean
+      label: 'Show content sync ID'
+    content_sync_ids:
+      type: sequence
+      label: 'List of content configuration names'
+      sequence:
+        type: string
+    register_password:
+      type: boolean
+      label: 'Register password'
+    error_page:
+      type: mapping
+      label: 'Error page settings'
+      mapping:
+        mode:
+          type: boolean
+          label: 'Enable custom error page'
+        content:
+          type: string
+          label: 'Error page content'
+    config_import_ignore:
+      type: mapping
+      label: 'Config import ignore'
+      mapping:
+        mode:
+          type: boolean
+          label: 'Enable config import ignore'
+        list:
+          type: sequence
+          label: 'Ignored config names'
+          sequence:
+            type: string
+    meta:
+      type: mapping
+      label: 'Meta settings'
+      mapping:
+        frontpage:
+          type: mapping
+          label: 'Frontpage'
+          mapping:
+            active:
+              type: boolean
+              label: 'Active'
+            title:
+              type: string
+              label: 'Page title'
+            description:
+              type: string
+              label: 'Description'
+            keywords:
+              type: string
+              label: 'Keywords'
+            metatags:
+              type: string
+              label: 'Meta tags'
+        node:
+          type: mapping
+          label: 'Node'
+          mapping:
+            active:
+              type: boolean
+              label: 'Active'
+            description:
+              type: string
+              label: 'Description'
+
+# schema for Content sync.
+mix.content_sync.*:
+  type: config_entity
+  label: Block content as config
+  mapping:
+    entity:
+      type: ignore
+      label: Normalized entity.
+
+# schema for block class.
+block.block.*.third_party.mix:
+  type: mapping
+  label: Block third party settings
+  mapping:
+    class:
+      type: string
+      label: Block class(es)
+    dropdown:
+      type: boolean
+      label: Dropdown

@@ -1,0 +1,29 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - facets.facet.crm_type
+  module:
+    - contacts
+    - facets
+    - system
+  theme:
+    - claro
+id: contacts_facet_crm_type
+theme: claro
+region: sidebar_first
+weight: 0
+provider: null
+plugin: 'facet_block:crm_type'
+settings:
+  id: 'facet_block:crm_type'
+  label: Type
+  provider: facets
+  label_display: visible
+  block_id: type
+visibility:
+  request_path:
+    id: request_path
+    pages: /admin/contacts
+    negate: false
+    context_mapping: {  }

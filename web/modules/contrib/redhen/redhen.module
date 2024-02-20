@@ -1,0 +1,69 @@
+<?php
+
+/**
+ * @file
+ * Contains redhen.module..
+ */
+
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function redhen_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the redhen module.
+    case 'help.page.redhen':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('RedHen CRM') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_toolbar().
+ */
+function redhen_toolbar() {
+  $items['redhen'] = [
+    '#type' => 'toolbar_item',
+    '#attached' => [
+      'library' => [
+        'redhen/drupal.redhen.toolbar',
+      ],
+    ],
+  ];
+
+  return $items;
+}
+
+/**
+ * Extracts a specific type of entity from the current route.
+ *
+ * @return null|\Drupal\Core\Entity\EntityInterface
+ *   Entity type id.
+ */
+function redhen_get_entity_from_route($entity_type = NULL, $disallowed_types = []) {
+  foreach (\Drupal::routeMatch()->getParameters() as $param) {
+    if ($param instanceof EntityInterface) {
+      $param_entity_type = $param->getEntityTypeId();
+      if (!in_array($param_entity_type, $disallowed_types)) {
+        if (!$entity_type || $param_entity_type === $entity_type) {
+          return $param;
+        }
+      }
+    }
+  }
+  // Fall back to manual load in case an entity object isn't found when we have
+  // a specific entity type.
+  if ($entity_type) {
+    $entity_id = \Drupal::routeMatch()->getParameter($entity_type);
+    if ($entity_id) {
+      return \Drupal::entityTypeManager()->getStorage($entity_type)->load($entity_id);
+    }
+  }
+  return NULL;
+}

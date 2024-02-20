@@ -1,0 +1,68 @@
+<div {{ attributes.addClass('card') }}>
+  <div class="card__content-wrapper">
+    <div class="card__content">
+
+      <div class="card__content-item heading-f dash-card-header">
+        <span class="handle"><svg class="role-icon" viewBox="0 0 8 8" style="fill:#000000;"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#move" class="icon-move"></use></svg></span>
+        <h3>{{ label }}</h3>
+        <div class="manage-links">
+          <span class="manage-trigger">
+            <a href="#" data-ajax-url="#" data-dialog-type="dialog" data-dialog-renderer="off_canvas" data-ajax-progress="fullscreen" class="use-ajax">
+              <svg class="role-icon" viewBox="0 0 8 8" style="fill:#5bc0de;">
+                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cog" class="icon-cog"></use>
+              </svg>
+            </a>
+          </span>
+        </div>
+      </div>
+
+      {% if pseudo_content %}
+        <div class="dnd-content card__content-item">
+          <div class="card-text field"></div>
+          <div class="card-text field"></div>
+        </div>
+      {% endif %}
+      {% if content %}
+        <div class="card__content-item">
+          {% if content.description %}
+            <div class="card-text"><strong>{{ content.description }}</strong></div>
+          {% endif %}
+          {% if content.needed_hats %}
+            <hr>
+            <div class="small card-text">
+              Allowed for users with hats:<br>
+              {%- for hat in content.needed_hats -%}
+                {{ hat }}
+              {%- endfor -%}
+            </div>
+          {% endif %}
+          {% if content.placed_tabs %}
+            <hr>
+            <div class="small card-text">
+              Currently placed on tabs:<br>
+              {%- for tab in content.placed_tabs -%}
+                <span class="btn btn-outline-primary btn-sm mr-2">{{ tab|raw }}</span>
+              {%- endfor -%}
+            </div>
+          {% endif %}
+          {% if content.configure_form %}
+            {{ content.configure_form }}
+          {% endif %}
+          {% if content.links %}
+            <hr>
+            {{ content.links }}
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+
+    {% if footer %}
+      <div class="card__footer">
+        {% if footer.visible_hats %}
+          <span>Visible for:</span>
+          {{ footer.visible_hats }}
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+</div>

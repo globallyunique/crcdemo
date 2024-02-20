@@ -1,0 +1,48 @@
+<?php
+
+/**
+  * Implements hook_views_pre_view().
+  * The patient_card is displayed in two places with different URLs:
+  * - on the Events or Checklist page. The URL contains the patientID as part of the URL, e.g., 'events/1234'
+  * - on a webform page. The URL has the patientID as a parameter, e.g., '/form/t-nct02702401-meds?maestro=1&queueid=1589&patientID=1433'
+  * The code checks which of these cases is encountered and sets the context filter for the ID accordingly.
+  * 
+  * When you set a value in $args[0], you're setting the value for the first contextual filter. The view has only one contextual filter, so this is the one we want.
+  * 
+  * Background info: If the view has no contextual filters defined, the $args array in the hook_views_pre_view() function will be empty. 
+  * Any values you add to the $args array will not have any effect on the view's results, because there are no contextual filters to apply them to.
+  * The contextual filter is defined in the view's configuration, under the Advanced section. Once you've added a contextual filter, you can use hook_views_pre_view() to set the filter's value dynamically.
+ */
+
+function checklist_view_views_pre_view(\Drupal\views\ViewExecutable $view, $display_id, array &$args) {
+  if ($view->id() !== 'watchdog') {
+    \Drupal::logger('checklist_view')->info('checklist_view_views_pre_view view->id: '. $view->id(). ' display_id: '. $display_id);
+  }
+
+  /* TODO - do we need this, as caching doesn't affect breadcrumb */
+  if ($view->id() == 'selected_patient') {
+    $view->display_handler->setOption('cache', [
+      'type' => 'none',
+    ]);
+    $request = \Drupal::request();
+    \Drupal::logger('checklist_view')->info('checklist_view_views_pre_view matched id: '. $view->id()); 
+    if ($request->query->has('patientID')) {
+      $args[0] = $request->query->get('patientID');
+      \Drupal::logger('checklist_view')->info('patientID from query is: ' . $args[0]);
+    } else {
+      // Split the path into segments. The second segment is the patientID
+      $path = $request->getPathInfo();
+      $segments = explode('/', trim($path, '/'));
+      \Drupal::logger('checklist_view')->info('path: ' . $path);
+      \Drupal::logger('checklist_view')->info('segments: ' . print_r($segments, TRUE));
+      if (isset($segments[1])) {     // Get the patient Id from the second segment
+        $args[0] = $segments[1];
+        \Drupal::logger('checklist_view')->info('patientID from path is: ' . $args[0]);
+      } else {
+        \Drupal::logger('checklist_view')->error('No patientID found in URL. This should not happen');
+        $args[0] = 0;
+      }
+    }
+
+  }
+}

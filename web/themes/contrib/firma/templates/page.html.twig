@@ -1,0 +1,145 @@
+	<div class="site-header">
+		<div id="top-header" class="uk-background-primary uk-padding-small uk-light">
+			<div class="uk-container">
+				<div class="uk-flex uk-flex-middle">
+					<div class="uk-margin-auto-right uk-visible@m">
+						{% if show_contact %}
+						<div uk-grid>
+							<div>
+								<span class="uk-margin-small-right" uk-icon="receiver"></span>{{ phone }}
+							</div>
+							<div>
+								<span class="uk-margin-small-right" uk-icon="mail"></span>{{ email }}
+							</div>
+						</div>
+					{% endif %}
+					</div>
+					{% if show_social_icon %}
+					<div class="uk-width-auto">
+						<div class="right-header uk-text-right">
+							<ul class="uk-flex-inline uk-flex-middle uk-flex-nowrap uk-grid-medium" uk-grid>
+								<li><a href="{{ facebook_url }}" class="uk-icon-button" uk-icon="facebook"></a></li>
+								<li><a href="{{ instagram_url }}" class="uk-icon-button" uk-icon="instagram"></a></li>
+								<li><a href="{{ twitter_url }}" class="uk-icon-button" uk-icon="twitter"></a></li>
+								<li><a href="{{ youtube_url }}" class="uk-icon-button" uk-icon="youtube"></a></li>
+							</ul>
+						</div>
+					</div>
+				{% endif %}
+				</div>
+			</div>
+		</div>
+		<div id="main-header" class="uk-card uk-card-default uk-section uk-section-default uk-section-xsmall" uk-header uk-sticky="show-on-up: true; animation: uk-animation-slide-top">
+			<div class="uk-container">
+				<nav class="uk-navbar-container uk-navbar-transparent" uk-navbar>
+					{% if page.navbar_left %}
+					<div class="uk-navbar-left">
+						{{ page.navbar_left }}
+					</div>
+					{% endif %}
+					{% if page.navbar_right %}
+					<div class="uk-navbar-right">
+						<div class="menu uk-text-right uk-visible@m">
+							{{ page.navbar_right }}
+						</div>
+						<a class="uk-navbar-toggle uk-hidden@m" uk-toggle href="#mobile-menu">
+							<div uk-navbar-toggle-icon></div>
+						</a>
+					</div>
+					{% endif %} 
+				</nav>
+				<div class="responsive-menu text-right uk-hidden@m">
+					<div id="mobile-menu" class="menu" uk-offcanvas>
+						<div class="uk-offcanvas-bar">
+							{{ page.navbar_right }}
+					</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	{% if is_front and show_slideshow %}
+
+	<div id="slideshow" class="uk-position-relative uk-visible-toggle" tabindex="-1" uk-slideshow="{{ slideshow_ratio }}">
+		<ul class="uk-slideshow-items">
+			{% for slider_contents in slider_content %}
+			{{ slider_contents | raw }}
+			{% endfor %}
+		</ul>
+		<a class="uk-position-center-left uk-position-small uk-hidden-hover uk-label uk-light" href="#" uk-slidenav-previous uk-slideshow-item="previous"></a>
+		<a class="uk-position-center-right uk-position-small uk-hidden-hover uk-label uk-light" href="#" uk-slidenav-next uk-slideshow-item="next"></a>
+	</div>
+	{% endif %}
+
+
+
+	{% if page.content_top_up %}
+	<div class="uk-section uk-section-default">
+		<div class="uk-container">
+			{{ page.content_top_up }}
+		</div>
+	</div>
+	{% endif %}
+
+
+	{% if page.content_top_down %}
+	<div class="uk-section uk-section-secondary">
+		<div class="uk-container">
+			{{ page.content_top_down }}
+		</div>
+	</div>
+	{% endif %}
+
+
+	<!--- Start Content -->
+	{% if page.content %}
+	<div class="main-content">
+		<div class="uk-section uk-section-default">
+			<div class="uk-container">
+				<div uk-grid>
+					{% if page.sidebar_first %}
+					<div class="uk-width-1-4 uk-visible@m">
+						{{ page.sidebar_first }}
+					</div>
+					{% endif %}
+					<div class="uk-width-expand">
+						{{ page.content }}
+					</div>
+					{% if page.sidebar_second %}
+					<div class="uk-width-1-4 uk-visible@m">
+						{{ page.sidebar_second }}
+					</div>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	</div>
+	{% endif %}
+	<!-- End: Content -->
+
+
+	{% if page.content_bottom %}
+	<div class="uk-section uk-section-muted">
+		<div class="uk-container">
+			{{ page.content_bottom }}
+		</div>
+	</div>
+	{% endif %}
+
+
+	{% if page.footer %}
+	<div class="uk-section uk-section-primary uk-section-xsmall uk-position-bottom">
+		<div class="uk-container">
+			<div class="uk-flex uk-flex-middle">
+				<div class="uk-width-auto">
+					{{ page.footer }}
+				</div>
+				<div class="uk-margin-auto-left uk-text-center">
+					<a class="uk-icon-button" href="" uk-totop uk-scroll></a>
+				</div>
+			</div>
+		</div>
+	</div>
+	{% endif %}

@@ -1,0 +1,17 @@
+name: Decoupled User Authentication
+description: "Allow decoupling of Drupal Authentication from Drupal Users."
+package: Tool
+
+type: module
+core_version_requirement: ^9 || ^10
+
+dependencies:
+  - drupal:user
+
+test_dependencies:
+  - profile:profile
+
+# Information added by Drupal.org packaging script on 2023-04-26
+version: '2.0.0'
+project: 'decoupled_auth'
+datestamp: 1682502945

@@ -1,0 +1,37 @@
+{
+  "name": "drupal/decoupled_auth",
+  "description": "Allow decoupling of Drupal Authentication from Drupal Users.",
+  "type": "drupal-module",
+  "license": "GPL-2.0+",
+  "require": {
+    "cweagans/composer-patches": "~1.0",
+    "drupal/profile": "~1.0",
+    "drupal/address": "~1.0"
+  },
+  "require-dev": {
+    "drupal/coder": "^8.2",
+    "drupal/user_registrationpassword": "^2.0",
+    "drupal/email_registration": "^1.1",
+    "drupal/simplenews": "^3.0-beta"
+  },
+  "conflict": {
+    "drupal/email_registration": "<1.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "Drupal\\decoupled_auth\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Drupal\\Tests\\decoupled_auth\\": "tests/src"
+    }
+  },
+  "extra": {
+    "patches": {
+      "drupal/email_registration": {
+        "#2935622: Calling save inside hook_user_insert is dangerous": "https://www.drupal.org/files/issues/2020-10-28/2935622-extract_name_change_logic.patch"
+      }
+    }
+  }
+}

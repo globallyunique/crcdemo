@@ -1,0 +1,19 @@
+uuid: 8ce547d1-82ab-49de-beba-f1febd2aa28e
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: n3apyoGxa1LPAK6XRdStCAhbchHnZIYCtH019h0cl0I
+template: contacts_log_insert_user
+label: 'User Created'
+description: 'The new user is created.'
+text:
+  -
+    value: "<p>User account created.</p>\r\n"
+    format: basic_html
+settings:
+  'token options':
+    clear: false
+    'token replace': true
+  purge_override: false
+  purge_methods: {  }

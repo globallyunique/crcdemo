@@ -1,0 +1,10 @@
+name: Admin Theme
+type: module
+description: "Enable the administration theme on more paths than possible with Drupal's default administration page."
+core_version_requirement: ^8.8 || ^9 || ^10
+configure: system.themes_page
+
+# Information added by Drupal.org packaging script on 2023-04-13
+version: '8.x-1.0'
+project: 'admin_theme'
+datestamp: 1681407051

@@ -1,0 +1,7 @@
+name: Maestro Engine Module
+description: Provides the engine and API for Maestro.
+core_version_requirement: ^9.4 || ^10
+configure: maestro.maestro_admin_settings
+package: Maestro
+type: module
+scripts:

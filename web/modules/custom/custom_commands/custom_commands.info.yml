@@ -1,0 +1,5 @@
+name: Custom Commands
+type: module
+description: 'Provides custom Drush commands for the SOP Engine project.'
+core_version_requirement: ^10
+package: Custom

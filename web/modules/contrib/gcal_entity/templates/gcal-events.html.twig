@@ -1,0 +1,23 @@
+{% set current_when = '' %}
+{% for event in events %}
+  <div class="gal_{{ event.event_id }}">
+    <div class="calendar-date-block">
+      {% if event.when != current_when %}
+        {% set current_when = event.when %}
+        <span class="date-display-single">{{ event.start_timestamp|date('M') }}</span>
+        <span class="date-number">
+          <span class="date-display-single">{{ event.start_timestamp|date('j') }}</span>
+         </span>
+      {% endif %}
+      <div class='date-events'>
+      <a href="{{ event.url }}"
+         title="View details on Google Calendar">{{ event.title }}</a>
+      </div>
+    </div>
+  </div>
+{% endfor %}
+
+
+
+
+

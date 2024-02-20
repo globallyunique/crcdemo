@@ -1,0 +1,9 @@
+gcal_entity.config:
+  path: 'admin/config/gcal_entity/config'
+  defaults:
+    _form: '\Drupal\gcal_entity\Form\GcalConfigForm'
+    _title: 'GCal Entity Configuration Form'
+  requirements:
+    _permission: 'administer gcal entity entities'
+  options:
+    _admin_route: TRUE

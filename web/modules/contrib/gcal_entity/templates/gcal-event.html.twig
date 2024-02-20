@@ -1,0 +1,10 @@
+<div class="gcal-entity-event">
+  <div class="gcal-entity-date">
+    <div class="gcal-entity-month">{{ event.start_timestamp|date('M') }}</div>
+    <div class="gcal-entity-day">{{ event.start_timestamp|date('j') }}</div>
+  </div>
+  <div class="gcal-entity-event-title" id="gal_{{ event.event_id }}">
+    <a href="{{ event.url }}"
+       title="View details on Google Calendar">{{ event.title }}</a>
+  </div>
+</div>

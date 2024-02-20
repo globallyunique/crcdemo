@@ -1,0 +1,19 @@
+add gcal entity entities:
+  title: 'Create new GCal Entity entities'
+
+administer gcal entity entities:
+  title: 'Administer GCal Entity entities'
+  description: 'Allow to access the administration form to configure GCal Entity entities.'
+  restrict access: true
+
+delete gcal entity entities:
+  title: 'Delete GCal Entity entities'
+
+edit gcal entity entities:
+  title: 'Edit GCal Entity entities'
+
+view published gcal entity entities:
+  title: 'View published GCal Entity entities'
+
+view unpublished gcal entity entities:
+  title: 'View unpublished GCal Entity entities'

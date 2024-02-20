@@ -1,0 +1,33 @@
+features:
+   comment_user_picture: true
+   comment_user_verification: true
+   favicon: true
+   logo: true
+   name: true
+   node_user_picture: true
+   slogan: true
+phone: '+90 (987) 654 32 10'
+email: 'info@seasernet.com'
+facebook_url: 'https://www.facebook.com/seasernet'
+twitter_url: 'https://twitter.com/seasernet'
+linkedin_url: 'https://www.linkedin.com/company/seasernet'
+instagram_url: 'https://www.instagram.com/seasernet'
+youtube_url: 'https://www.youtube.com/seasernet'
+
+# Toggle Social Media, Credit Link and Slideshow
+show_social_icon: 1
+show_slideshow: 1
+
+#Slider Default Values
+no_of_slides: 2
+
+#Slider Default Images & Description
+slide_title_1: 'FIRMA TEMPLATE'
+slide_description_1: 'Praesent tincidunt neque semper elementum gravida. Donec id euismod magna. Ut erat ligula, malesuada eu quam a, fringilla auctor augue.' 
+slide_url_1: '#'
+slide_image_path_1: '/images/slider/slide_01.jpg'
+
+slide_title_2: 'RESPONSIVE MOBILE'
+slide_description_2: 'Ea, similique, odit id consectetur est beatae quia dicta officiis ipsam itaque in facilis aliquid quas officia voluptatem repellendus repellat!' 
+slide_url_2: '#'
+slide_image_path_2: '/images/slider/slide_02.jpg'

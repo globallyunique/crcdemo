@@ -1,0 +1,9 @@
+services:
+  theme_rule.negotiator:
+    class: Drupal\theme_rule\Theme\ThemeRuleNegotiator
+    arguments:
+      - '@entity_type.manager'
+      - '@context.repository'
+      - '@context.handler'
+    tags:
+      - { name: theme_negotiator, priority: 10 }
